@@ -1,0 +1,32 @@
+{
+  "name": "goatty-website",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Website for Goatty (Fast, batteries-included, opinionated GPU terminal)",
+  "scripts": {
+    "dev": "bun --bun astro dev --port 4815",
+    "start": "bun --bun astro dev --port 4815",
+    "build": "bun --bun astro build",
+    "preview": "bun --bun astro preview --port 4816",
+    "preview:worker": "wrangler dev --port 8795",
+    "check": "bun --bun astro check",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "ci:check": "biome ci . && bun --bun astro check && tsc --noEmit && bun --bun astro build",
+    "deploy": "bun --bun astro build && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.5",
+    "@astrojs/starlight": "^0.43.1",
+    "astro": "^7.4.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@biomejs/biome": "^2.6.8",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.164.0"
+  }
+}

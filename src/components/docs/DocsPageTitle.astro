@@ -1,0 +1,43 @@
+---
+const { entry } = Astro.locals.starlightRoute;
+const { title, description } = entry.data;
+---
+
+<div class="docs-page-header">
+  <p class="docs-page-kicker">Documentation</p>
+  <h1 id="_top">{title}</h1>
+  {description && <p class="docs-page-lead">{description}</p>}
+</div>
+
+<style>
+.docs-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.docs-page-kicker {
+  font-family: "Silkscreen", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #ff5a00;
+  margin: 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: var(--sl-color-white);
+}
+
+.docs-page-lead {
+  margin: 4px 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: #b2b2ba;
+  max-width: 58ch;
+}
+</style>

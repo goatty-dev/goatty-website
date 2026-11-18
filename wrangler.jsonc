@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "goatty-website",
+  "compatibility_date": "2026-11-17",
+  // Keep workers_dev enabled until a custom domain is connected.
+  // Once a custom domain is configured via `routes`, set `"workers_dev": false`
+  // to prevent search engines from indexing duplicate workers.dev URLs.
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "dev": {
+    "port": 8795
+  }
+}

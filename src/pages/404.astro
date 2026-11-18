@@ -1,0 +1,58 @@
+---
+import GoattyLogo from "@/components/GoattyLogo.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="404 — goatty" description="Page not found.">
+  <main class="not-found container">
+    <a href="/" class="back-brand" aria-label="goatty home">
+      <GoattyLogo size={26} />
+    </a>
+    <p class="code pixel-text">404</p>
+    <h1>Page not found.</h1>
+    <p class="copy">The path you asked for does not exist on this site.</p>
+    <div class="not-found-actions">
+      <a href="/" class="btn btn-primary">Return home</a>
+      <a href="/docs/getting-started" class="btn btn-secondary"
+        >Read the docs</a
+      >
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+.not-found {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+}
+
+.back-brand {
+  margin-bottom: 16px;
+}
+
+.code {
+  font-size: 0.9375rem;
+  color: var(--accent-orange);
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.copy {
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+</style>

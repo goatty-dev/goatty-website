@@ -1,0 +1,894 @@
+---
+import DitherCard from "@/components/DitherCard.astro";
+import GoattyLogo from "@/components/GoattyLogo.astro";
+import InstallBar from "@/components/InstallBar.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+interface PillarTab {
+  id: string;
+  label: string;
+  heading: string;
+  body: string;
+  lines: readonly string[];
+}
+
+const pillars: PillarTab[] = [
+  {
+    id: "zsh",
+    label: "Managed .zsh",
+    heading: "Autocomplete, syntax check, and snippets built in",
+    body: "Inline suggestions, fuzzy history search, and plain-English snippets work immediately without editing ~/.zshrc.",
+    lines: [
+      "$ | first 20 lines     ->  | head -n 20",
+      "highlighting   valid commands green, typos red",
+      "history        fuzzy search via fzf",
+    ],
+  },
+  {
+    id: "gui",
+    label: "GPUI Settings",
+    heading: "Visual controls for themes, PATH, and aliases",
+    body: "Open Settings to adjust fonts, prompt style, PATH folders, and aliases — no config syntax to memorize.",
+    lines: [
+      "Settings  >  GPUI Controls",
+      "PATH manager    add, reorder, toggle folders",
+      "profiles        switch & roll back any change",
+    ],
+  },
+  {
+    id: "editor",
+    label: "Editor feel",
+    heading: "Ctrl+C, Ctrl+V, and pane search",
+    body: "Copy and paste work with standard desktop shortcuts, and scrollback search behaves like a text editor.",
+    lines: [
+      "copy / paste    Ctrl+C (selection) & Ctrl+V",
+      "pane search     find inside scrollback instantly",
+      "keybinds        rebind any shortcut in Settings",
+    ],
+  },
+  {
+    id: "plugins",
+    label: "One-click plugins",
+    heading: "Curated shell tools without package guesswork",
+    body: "Install fzf, starship, autosuggestions, and highlighting inside goatty — no root or manual sourcing.",
+    lines: [
+      "included        autosuggestions, fzf, starship",
+      "setup           toggle on or off in Settings",
+      "safety          ~/.zshrc stays untouched",
+    ],
+  },
+];
+
+const replacements = [
+  {
+    oldTool: "oh-my-zsh & .zshrc tweaks",
+    newWay: "Managed Zsh out of the box",
+  },
+  {
+    oldTool: "Starship & manual theming",
+    newWay: "Visual GUI prompt & themes",
+  },
+  { oldTool: "fzf + history setup", newWay: "Fuzzy history & fzf-tab ready" },
+  { oldTool: "tmux / screen", newWay: "Persistent goattyd sessions" },
+  {
+    oldTool: "Manual SSH & Mosh config",
+    newWay: "Tailscale pairing & SSH sync",
+  },
+  {
+    oldTool: "Hand-edited PATH & aliases",
+    newWay: "GUI PATH, aliases & snippets",
+  },
+];
+---
+
+<BaseLayout
+  title="goatty — Managed Zsh & GPU Terminal for Linux"
+  description="A GPU-rendered terminal with zero-config managed Zsh, visual GUI settings, Tailscale and SSH host sync, and persistent background sessions."
+>
+  <div class="nav-wrap">
+    <header class="floating-pill">
+      <a href="/" class="brand-link" aria-label="goatty home">
+        <GoattyLogo size={24} />
+      </a>
+
+      <nav class="pill-nav" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#replaces">Stack</a>
+        <a href="#shell">Inside</a>
+        <a href="#remote">Remote</a>
+        <a href="/docs/getting-started">Docs</a>
+      </nav>
+
+      <a
+        href="https://github.com/goatty-dev/goatty"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="pill-cta"
+      >
+        GitHub
+      </a>
+    </header>
+  </div>
+
+  <main>
+    <section id="install" class="hero">
+      <div class="container hero-inner">
+        <p class="hero-kicker pixel-text">
+          Linux GPU terminal — macOS and Windows planned
+        </p>
+        <h1>A working shell from your first command.</h1>
+        <p class="hero-lead">
+          A Linux terminal you can use from day one — zero-config managed Zsh,
+          visual GPUI settings, and persistent sessions that outlive your
+          window.
+        </p>
+
+        <div class="hero-install">
+          <InstallBar />
+          <div class="hero-links">
+            <a
+              href="https://github.com/goatty-dev/goatty/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary"
+            >
+              Download release
+            </a>
+            <a href="/docs/getting-started" class="btn btn-secondary">
+              Read the docs
+            </a>
+            <a
+              href="https://github.com/goatty-dev/goatty"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-secondary"
+            >
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="showcase">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2>Zero configuration required</h2>
+        </div>
+
+        <div class="showcase-grid">
+          <div data-reveal data-reveal-delay="0">
+            <DitherCard
+              scene="zsh-layers"
+              title="Managed .zsh out of the box"
+              description="Autocomplete, syntax checks, Starship prompts, fzf history, and guided snippets ready on first launch."
+            />
+          </div>
+          <div data-reveal data-reveal-delay="80">
+            <DitherCard
+              scene="gui-plugins"
+              title="Every setting in the GUI"
+              description="Edit themes, fonts, PATH, aliases, snippets, and plugins visually — no config files to learn."
+            />
+          </div>
+          <div data-reveal data-reveal-delay="160">
+            <DitherCard
+              scene="key-matrix"
+              title="Ctrl+C, Ctrl+V, and pane search"
+              description="Desktop copy/paste shortcuts work by default, with editor-style search and instant keybind edits."
+            />
+          </div>
+          <div data-reveal data-reveal-delay="240">
+            <DitherCard
+              scene="ssh-bridge"
+              title="Same shell on every host"
+              description="Connect via Tailscale or SSH and keep your exact Zsh, prompt, and plugins on remote machines."
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="replaces" class="replaces" data-reveal>
+      <div class="container replaces-grid">
+        <div class="replaces-intro">
+          <h2>Six tools replaced by one terminal</h2>
+          <p>
+            Skip wiring prompts, plugins, and multiplexers by hand — everything
+            ships built in and editable in Settings.
+          </p>
+          <p class="replaces-note">
+            Similar in spirit to <strong>Rex Terminal</strong> by Superlogical,
+            Goatty takes a beginner-first path:{" "}
+            <strong>no Lua to learn</strong>, visual theming, and your exact
+            managed shell synced across hosts.
+          </p>
+        </div>
+
+        <dl class="replace-list">
+          {replacements.map((item) => (
+            <div class="replace-row">
+              <dt>{item.oldTool}</dt>
+              <dd>{item.newWay}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section id="shell" class="explorer" data-reveal>
+      <div class="container">
+        <div class="explorer-head">
+          <h2>See how the pieces fit</h2>
+          <p>
+            Everything beginners need works from your first command — no dotfile
+            boilerplate.
+          </p>
+        </div>
+
+        <div class="pieces-grid">
+          {pillars.map((pillar) => (
+            <div class="piece-item">
+              <p class="piece-kicker pixel-text">{pillar.label}</p>
+              <h3>{pillar.heading}</h3>
+              <p class="piece-body">{pillar.body}</p>
+              <div class="piece-preview">
+                {pillar.lines.slice(0, 3).map((line) => (
+                  <div class="preview-line">{line}</div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="remote" class="remote-strip">
+      <div class="container strip-grid">
+        <div class="strip-item" data-reveal data-reveal-delay="0">
+          <p class="strip-kicker pixel-text">Tailscale & SSH</p>
+          <h3>One shell across every host</h3>
+          <p>
+            Pair over Tailscale or connect via SSH. Your prompt, aliases, and
+            plugins follow you without manual dotfile syncing.
+          </p>
+        </div>
+
+        <div class="strip-item" data-reveal data-reveal-delay="90">
+          <p class="strip-kicker pixel-text">Fast remote sync</p>
+          <h3>Lazy scrollback, Mosh-style feel</h3>
+          <p>
+            Only the active screen syncs immediately while history loads on
+            scroll, keeping typing snappy on weak Wi-Fi.
+          </p>
+        </div>
+
+        <div class="strip-item" data-reveal data-reveal-delay="180">
+          <p class="strip-kicker pixel-text">Background AI</p>
+          <h3>Agents stay running when closed</h3>
+          <p>
+            Close Goatty anytime while Claude Code, Codex, OpenCode, or
+            Antigravity keep running in goattyd with live tab alerts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" data-reveal>
+      <div class="container closing-inner">
+        <div class="wordmark-stage">
+          <canvas data-dither-wordmark aria-hidden="true"></canvas>
+        </div>
+
+        <div class="closing-copy">
+          <h2>Ready when you open it.</h2>
+          <p>
+            Linux packages ready today, with native macOS and Windows builds
+            planned.
+          </p>
+          <div class="closing-actions">
+            <a href="#install" class="btn btn-primary">Install on Linux</a>
+            <a href="/docs/getting-started" class="btn btn-secondary">
+              Read the docs
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <GoattyLogo size={22} />
+        <span class="footer-note">
+          GPU terminal for Linux. macOS and Windows planned.
+        </span>
+      </div>
+
+      <nav class="footer-links" aria-label="Footer">
+        <a href="/docs/getting-started">Docs</a>
+        <a
+          href="https://github.com/goatty-dev/goatty"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+        <a
+          href="https://github.com/goatty-dev/goatty/releases"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Releases
+        </a>
+        <a
+          href="https://github.com/goatty-dev/goatty/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Issues
+        </a>
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<script>
+import { initDitherCanvases, initDitherWordmark } from "@/scripts/dither3d";
+
+initDitherCanvases();
+initDitherWordmark();
+
+// Smooth scroll reveal for below-the-fold sections
+const revealEls = document.querySelectorAll<HTMLElement>("[data-reveal]");
+const reducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)",
+).matches;
+
+if (reducedMotion || !("IntersectionObserver" in window)) {
+  for (const el of revealEls) {
+    el.classList.add("is-visible");
+  }
+} else {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const el = entry.target as HTMLElement;
+        const delay = el.dataset.revealDelay;
+        if (delay) {
+          el.style.transitionDelay = `${delay}ms`;
+        }
+        el.classList.add("is-visible");
+        revealObserver.unobserve(el);
+      }
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+  );
+
+  for (const el of revealEls) {
+    revealObserver.observe(el);
+  }
+}
+</script>
+
+<style>
+/* Scroll reveal animation */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Modern Floating Pill Navbar (solid matte, zero glass blur, zero weird shadows) */
+.nav-wrap {
+  position: sticky;
+  top: 16px;
+  z-index: 50;
+  padding-inline: var(--gutter);
+  pointer-events: none;
+}
+
+.floating-pill {
+  pointer-events: auto;
+  max-width: 780px;
+  margin-inline: auto;
+  padding: 7px 7px 7px 18px;
+  border-radius: 999px;
+  background-color: #101014;
+  border: 1px solid #24242b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pill-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.pill-nav a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  transition: color 140ms ease;
+}
+
+.pill-nav a:hover {
+  color: var(--ink-primary);
+}
+
+.pill-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding-inline: 16px;
+  border-radius: 999px;
+  background-color: var(--ink-primary);
+  color: var(--bg-canvas);
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.pill-cta:hover {
+  background-color: var(--accent-orange);
+  color: var(--bg-canvas);
+}
+
+/* Hero + Install */
+.hero {
+  padding-top: clamp(56px, 8vw, 92px);
+  padding-bottom: clamp(64px, 8vw, 104px);
+}
+
+.hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero-kicker {
+  font-size: 0.8125rem;
+  color: var(--accent-orange);
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: clamp(2.35rem, 5.2vw, 3.85rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  max-width: 15ch;
+  color: var(--ink-primary);
+}
+
+.hero-lead {
+  margin-top: 20px;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  max-width: 58ch;
+}
+
+.hero-install {
+  margin-top: 34px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Showcase 2x2 */
+.showcase {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-bottom: 28px;
+}
+
+.section-head h2 {
+  font-size: clamp(1.375rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+}
+
+.section-head p {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 44px 28px;
+}
+
+/* What it replaces (open scannable 2-col layout) */
+.replaces {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.replaces-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 36px 56px;
+  align-items: start;
+}
+
+.replaces-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.replaces-intro h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  line-height: 1.16;
+  max-width: 18ch;
+}
+
+.replaces-intro p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  max-width: 44ch;
+}
+
+.replaces-note {
+  color: var(--ink-secondary);
+}
+
+.replaces-note strong {
+  color: var(--ink-primary);
+  font-weight: 500;
+}
+
+.replace-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 32px;
+}
+
+.replace-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.replace-row dt {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  text-decoration: line-through;
+  text-decoration-color: #3a3a45;
+}
+
+.replace-row dd {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink-primary);
+}
+
+/* Interactive Shell / GUI Explorer */
+.explorer {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.explorer-head {
+  max-width: 58ch;
+  margin-bottom: 24px;
+}
+
+.explorer-head h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  line-height: 1.16;
+}
+
+.explorer-head p {
+  margin-top: 10px;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.pieces-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 44px 48px;
+}
+
+.piece-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.piece-kicker {
+  font-size: 0.75rem;
+  color: var(--accent-orange);
+}
+
+.piece-item h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  color: var(--ink-primary);
+}
+
+.piece-body {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  max-width: 48ch;
+}
+
+.piece-preview {
+  margin-top: 6px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border-hairline);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.piece-preview::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-line {
+  white-space: pre;
+}
+
+.preview-line:first-child {
+  color: var(--ink-primary);
+}
+
+/* 3-column Remote & AI Agent Strip (unboxed, scannable) */
+.remote-strip {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.strip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px 40px;
+}
+
+.strip-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.strip-kicker {
+  font-size: 0.75rem;
+  color: var(--accent-orange);
+}
+
+.strip-item h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  color: var(--ink-primary);
+}
+
+.strip-item p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+/* Bottom Dithered Font Artwork + Closing CTA */
+.closing {
+  padding-bottom: clamp(64px, 8vw, 108px);
+}
+
+.closing-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.wordmark-stage {
+  width: 100%;
+  aspect-ratio: 18 / 5;
+  min-height: 140px;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordmark-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.closing-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.closing-copy h2 {
+  font-size: clamp(1.5rem, 2.8vw, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.closing-copy p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  max-width: 54ch;
+}
+
+.closing-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Footer */
+.site-footer {
+  padding-block: 36px 48px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-note {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  transition: color 140ms ease;
+}
+
+.footer-links a:hover {
+  color: var(--ink-primary);
+}
+
+@media (max-width: 860px) {
+  .replaces-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .strip-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 720px) {
+  .showcase-grid,
+  .pieces-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pill-nav a:nth-child(2),
+  .pill-nav a:nth-child(3),
+  .pill-nav a:nth-child(4) {
+    display: none;
+  }
+
+  .pill-nav {
+    gap: 14px;
+  }
+
+  .replace-list {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .wordmark-stage {
+    aspect-ratio: 12 / 5;
+  }
+}
+
+@media (max-width: 520px) {
+  .piece-preview {
+    font-size: 0.7rem;
+    padding-left: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .pill-nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .pill-nav a,
+  .pill-cta,
+  .footer-links a {
+    transition: none;
+  }
+}
+</style>

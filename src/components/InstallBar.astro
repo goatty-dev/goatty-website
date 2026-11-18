@@ -1,0 +1,259 @@
+---
+interface DistroOption {
+  id: string;
+  label: string;
+  command: string;
+  note: string;
+}
+
+const options: DistroOption[] = [
+  {
+    id: "arch",
+    label: "Arch Linux",
+    command: "paru -S goatty-bin",
+    note: "Available in the AUR. Also works with yay -S goatty-bin.",
+  },
+  {
+    id: "debian",
+    label: "Ubuntu / Debian",
+    command: "sudo apt install ./goatty_0.1.0-1_amd64.deb",
+    note: "Supports Ubuntu 22.04+ and Debian 12+. Download the .deb from GitHub Releases.",
+  },
+  {
+    id: "fedora",
+    label: "Fedora",
+    command: "sudo dnf install ./goatty-0.1.0-1.x86_64.rpm",
+    note: "Installs goatty, goattyd, desktop launcher, and shell completions.",
+  },
+  {
+    id: "tarball",
+    label: "Tarball",
+    command: "tar -xzf goatty-0.1.0-x86_64-linux.tar.gz && ./install.sh",
+    note: "No root required. Installs binaries into ~/.local/bin and bundled remote daemons.",
+  },
+];
+---
+
+<div class="install-widget" data-install-widget>
+  <div class="install-tabs" role="tablist" aria-label="Linux distribution">
+    {options.map((opt, index) => (
+      <button
+        type="button"
+        role="tab"
+        class="install-tab"
+        aria-selected={index === 0 ? "true" : "false"}
+        data-install-tab={opt.id}
+        data-command={opt.command}
+        data-note={opt.note}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+
+  <div class="command-strip">
+    <div class="command-line">
+      <span class="prompt pixel-text" aria-hidden="true">&gt;</span>
+      <code class="command-code" data-install-command
+        >{options[0].command}</code
+      >
+    </div>
+    <button
+      type="button"
+      class="copy-btn"
+      data-copy-btn
+      aria-label="Copy install command"
+    >
+      Copy
+    </button>
+  </div>
+
+  <p class="install-note" data-install-note>{options[0].note}</p>
+</div>
+
+<script>
+function initInstallWidgets(): void {
+  const widgets = document.querySelectorAll<HTMLElement>(
+    "[data-install-widget]",
+  );
+
+  for (const widget of widgets) {
+    const tabs =
+      widget.querySelectorAll<HTMLButtonElement>("[data-install-tab]");
+    const commandEl = widget.querySelector<HTMLElement>(
+      "[data-install-command]",
+    );
+    const noteEl = widget.querySelector<HTMLElement>("[data-install-note]");
+    const copyBtn = widget.querySelector<HTMLButtonElement>("[data-copy-btn]");
+
+    if (!commandEl || !noteEl || !copyBtn) continue;
+
+    let resetTimer = 0;
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => {
+        for (const other of tabs) {
+          other.setAttribute("aria-selected", "false");
+        }
+        tab.setAttribute("aria-selected", "true");
+        commandEl.textContent = tab.dataset.command ?? "";
+        noteEl.textContent = tab.dataset.note ?? "";
+        copyBtn.textContent = "Copy";
+      });
+    }
+
+    copyBtn.addEventListener("click", async () => {
+      const text = commandEl.textContent ?? "";
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = "Copied";
+        window.clearTimeout(resetTimer);
+        resetTimer = window.setTimeout(() => {
+          copyBtn.textContent = "Copy";
+        }, 1600);
+      } catch {
+        copyBtn.textContent = "Select manually";
+      }
+    });
+  }
+}
+
+initInstallWidgets();
+</script>
+
+<style>
+.install-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.install-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-hairline);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.install-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.install-tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 12px;
+  margin-bottom: -1px;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.install-tab:hover {
+  color: var(--ink-primary);
+}
+
+.install-tab[aria-selected="true"] {
+  color: var(--ink-primary);
+  border-bottom-color: var(--accent-orange);
+}
+
+.command-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 6px;
+  padding: 12px 14px 12px 18px;
+}
+
+.command-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.prompt {
+  color: var(--accent-orange);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.command-code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--ink-primary);
+  white-space: nowrap;
+}
+
+.copy-btn {
+  appearance: none;
+  flex-shrink: 0;
+  height: 32px;
+  padding-inline: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  background-color: transparent;
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.copy-btn:hover {
+  background-color: var(--ink-primary);
+  border-color: var(--ink-primary);
+  color: var(--bg-canvas);
+}
+
+.install-note {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 520px) {
+  .install-tabs {
+    gap: 18px;
+  }
+
+  .install-tab {
+    font-size: 0.875rem;
+  }
+
+  .command-strip {
+    padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .install-tab,
+  .copy-btn {
+    transition: none;
+  }
+}
+</style>

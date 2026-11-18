@@ -1,0 +1,55 @@
+---
+import GoattyLogo from "@/components/GoattyLogo.astro";
+---
+
+<div class="docs-brand">
+  <a href="/" class="docs-brand-home" aria-label="goatty home">
+    <GoattyLogo size={24} />
+  </a>
+  <span class="docs-brand-sep" aria-hidden="true">/</span>
+  <a href="/docs/getting-started" class="docs-brand-tag">docs</a>
+</div>
+
+<style>
+.docs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.docs-brand-home {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.docs-brand-sep {
+  color: #32323c;
+  font-family: var(--sl-font-mono);
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.docs-brand-tag {
+  font-family: "Silkscreen", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #ff5a00;
+  text-decoration: none;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #202026;
+  background-color: #0f0f12;
+  line-height: 1.2;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.docs-brand-tag:hover {
+  border-color: #ff5a00;
+  color: #ff6e1f;
+}
+</style>

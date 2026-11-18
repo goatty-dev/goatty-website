@@ -1,0 +1,121 @@
+---
+title: Getting started
+description: Install goatty on Linux, launch your managed Zsh environment, and customize everything visually in GPUI Settings.
+---
+
+import { Aside, Card, CardGrid, LinkCard, Steps, TabItem, Tabs } from "@astrojs/starlight/components";
+
+`goatty` is a fast, batteries-included GPU terminal for Linux (with native macOS and Windows builds planned). On first launch, it gives you a complete managed Zsh shell, visual GPUI Settings, editor-style shortcuts, and persistent `goattyd` sessions without touching your existing dotfiles.
+
+## Install on Linux
+
+Choose your Linux package or install from the standalone tarball without root access.
+
+<Tabs>
+  <TabItem label="Arch Linux" icon="linux">
+    Install directly from the AUR with `paru` or `yay`:
+
+    ```bash
+    paru -S goatty-bin
+    ```
+
+    If you use `yay`:
+
+    ```bash
+    yay -S goatty-bin
+    ```
+  </TabItem>
+
+  <TabItem label="Ubuntu / Debian" icon="linux">
+    Supports **Ubuntu 22.04+** and **Debian 12+**. Download the `.deb` package from [GitHub Releases](https://github.com/goatty-dev/goatty/releases) and install it with `apt`:
+
+    ```bash
+    sudo apt install ./goatty_0.1.0-1_amd64.deb
+    ```
+  </TabItem>
+
+  <TabItem label="Fedora" icon="linux">
+    Download the `.rpm` package from [GitHub Releases](https://github.com/goatty-dev/goatty/releases) and install with `dnf`. This includes `goatty`, `goattyd`, the desktop launcher, and shell completions:
+
+    ```bash
+    sudo dnf install ./goatty-0.1.0-1.x86_64.rpm
+    ```
+  </TabItem>
+
+  <TabItem label="Tarball (No root)" icon="seti:zip">
+    Extract the release tarball and run the bundled installer. Binaries and remote daemons are installed into `~/.local/bin`:
+
+    ```bash
+    tar -xzf goatty-0.1.0-x86_64-linux.tar.gz && ./install.sh
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip" title="Your ~/.zshrc stays untouched">
+  `goatty` runs its managed Zsh layer (`autosuggestions`, `fzf`, `starship`, syntax highlighting, and guided snippets) cleanly alongside your existing configuration — nothing in `~/.zshrc` is overwritten.
+</Aside>
+
+## First launch
+
+<Steps>
+1. **Open `goatty`**
+
+   Launch `goatty` from your application launcher or run `goatty` from an existing terminal.
+
+2. **Start typing with managed Zsh**
+
+   Inline autosuggestions, live syntax checking (valid commands highlight green, typos highlight red), fuzzy `fzf` history search, and plain-English snippets work immediately:
+
+   ```sh
+   $ | first 20 lines   # expands to -> | head -n 20
+   ```
+
+3. **Open GPUI Settings**
+
+   Adjust themes, fonts, Starship prompt styles, `PATH` folders (add, reorder, toggle), aliases, snippets, and curated plugins visually — no config syntax or Lua to learn. Any change can be switched across profiles or rolled back in Settings.
+
+4. **Connect remote hosts or keep agents running**
+
+   Pair over Tailscale or connect via SSH to sync your exact managed Zsh, prompt, and plugins onto remote machines. Background processes and AI agents (`Claude Code`, `Codex`, `OpenCode`, `Antigravity`) stay alive inside `goattyd` even when you close the window.
+</Steps>
+
+## What ships built in
+
+<CardGrid>
+  <Card title="Managed Zsh" icon="seti:shell">
+    Autosuggestions, syntax checks, Starship prompt, `fzf-tab`, and plain-English snippets ready on first command.
+  </Card>
+  <Card title="GPUI Settings" icon="setting">
+    Visual controls for themes, fonts, `PATH` management, aliases, snippets, and one-click plugins with profile rollback.
+  </Card>
+  <Card title="Editor feel" icon="laptop">
+    Standard desktop copy/paste (<kbd>Ctrl</kbd>+<kbd>C</kbd> on selection, <kbd>Ctrl</kbd>+<kbd>V</kbd>), instant scrollback search, and rebindable keybinds.
+  </Card>
+  <Card title="Tailscale, SSH & goattyd" icon="server">
+    Same managed shell across hosts, lazy scrollback sync for weak Wi-Fi, and persistent daemon sessions with live tab alerts.
+  </Card>
+</CardGrid>
+
+## Default essentials
+
+| Area | Default behavior | Where to customize |
+| --- | --- | --- |
+| Copy / Paste | <kbd>Ctrl</kbd>+<kbd>C</kbd> (with selection) & <kbd>Ctrl</kbd>+<kbd>V</kbd> | GPUI Settings → Keybinds |
+| Shell plugins | `autosuggestions`, `fzf`, `starship`, highlighting | GPUI Settings → Plugins |
+| PATH & Aliases | Add, reorder, or toggle visually | GPUI Settings → Shell |
+| Remote sync | Tailscale pairing & SSH host sync | Host switcher / `goattyd` |
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Download latest releases"
+    description="Grab .deb, .rpm, or tarball builds from GitHub Releases."
+    href="https://github.com/goatty-dev/goatty/releases"
+  />
+  <LinkCard
+    title="Source & issue tracker"
+    description="Browse the codebase, report bugs, or follow macOS and Windows progress."
+    href="https://github.com/goatty-dev/goatty"
+  />
+</CardGrid>

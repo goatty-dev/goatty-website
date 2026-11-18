@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://goatty-website.goatty-dev.workers.dev/sitemap-index.xml
