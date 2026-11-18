@@ -15,7 +15,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "ci:check": "biome ci . && bun --bun astro check && tsc --noEmit && bun --bun astro build",
+    "ci:check": "biome ci . && bun --bun astro check && tsc --noEmit && bun --bun astro build && bash scripts/smoke.sh",
+    "smoke": "bash scripts/smoke.sh",
     "deploy": "bun --bun astro build && wrangler deploy"
   },
   "dependencies": {
