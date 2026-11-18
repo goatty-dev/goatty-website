@@ -430,12 +430,20 @@
   }
 
   /* Anchor link headings */
-  .sl-anchor-link {
-    color: #7a7a85;
+  .sl-markdown-content .sl-anchor-link:not(:where(.not-content *)) {
+    color: #4c4c58;
+    text-decoration: none;
+    margin-inline-start: 0.35rem;
+    opacity: 0.55;
+    transition:
+      color 140ms ease,
+      opacity 140ms ease;
   }
 
-  .sl-anchor-link:hover {
+  .sl-markdown-content .sl-anchor-link:hover:not(:where(.not-content *)),
+  .sl-markdown-content .sl-heading-wrapper:hover .sl-anchor-link {
     color: #ff5a00;
+    opacity: 1;
   }
 
   /* Steps component hairline */
