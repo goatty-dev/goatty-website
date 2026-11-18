@@ -14,6 +14,7 @@ jobs:
   check:
     name: Lint, Typecheck, Build & Verify
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,21 +42,6 @@ jobs:
       - name: Verify Wrangler bundle
         run: bunx wrangler deploy --dry-run
 
-      - name: Smoke check built pages
-        run: |
-          test -f dist/index.html
-          test -f dist/404.html
-          test -f dist/robots.txt
-          test -f dist/sitemap-index.xml
-          bun --bun astro preview --port 4816 --host 127.0.0.1
-          trap "bun --bun astro preview stop || true" EXIT
-          for i in $(seq 1 20); do
-            if curl -fsS http://127.0.0.1:4816/ >/dev/null 2>&1; then
-              break
-            fi
-            sleep 0.5
-          done
-          curl -fsS http://127.0.0.1:4816/ | grep -q "<html"
-          curl -fsS http://127.0.0.1:4816/404.html | grep -q "404"
-          curl -fsS http://127.0.0.1:4816/robots.txt | grep -q "Sitemap:"
-          curl -fsS http://127.0.0.1:4816/sitemap-index.xml | grep -q "sitemap-0.xml"
+      - name: Smoke check built site
+        timeout-minutes: 5
+        run: bash scripts/smoke.sh
