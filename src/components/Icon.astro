@@ -1,0 +1,82 @@
+---
+import arrowRightRaw from "iconoir/icons/regular/arrow-right.svg?raw";
+import bookRaw from "iconoir/icons/regular/book.svg?raw";
+import checkRaw from "iconoir/icons/regular/check.svg?raw";
+import circleSparkRaw from "iconoir/icons/regular/circle-spark.svg?raw";
+import controlSliderRaw from "iconoir/icons/regular/control-slider.svg?raw";
+import copyRaw from "iconoir/icons/regular/copy.svg?raw";
+import cpuRaw from "iconoir/icons/regular/cpu.svg?raw";
+import downloadRaw from "iconoir/icons/regular/download.svg?raw";
+import githubRaw from "iconoir/icons/regular/github.svg?raw";
+import openInWindowRaw from "iconoir/icons/regular/open-in-window.svg?raw";
+import playRaw from "iconoir/icons/regular/play.svg?raw";
+import serverConnectionRaw from "iconoir/icons/regular/server-connection.svg?raw";
+import shortcutSquareRaw from "iconoir/icons/regular/shortcut-square.svg?raw";
+import terminalRaw from "iconoir/icons/regular/terminal.svg?raw";
+import wifiRaw from "iconoir/icons/regular/wifi.svg?raw";
+import windowXmarkRaw from "iconoir/icons/regular/window-xmark.svg?raw";
+
+const ICONS = {
+  "arrow-right": arrowRightRaw,
+  book: bookRaw,
+  check: checkRaw,
+  "circle-spark": circleSparkRaw,
+  "control-slider": controlSliderRaw,
+  copy: copyRaw,
+  cpu: cpuRaw,
+  download: downloadRaw,
+  github: githubRaw,
+  "open-in-window": openInWindowRaw,
+  play: playRaw,
+  "server-connection": serverConnectionRaw,
+  "shortcut-square": shortcutSquareRaw,
+  terminal: terminalRaw,
+  wifi: wifiRaw,
+  "window-xmark": windowXmarkRaw,
+} as const;
+
+export type IconName = keyof typeof ICONS;
+
+interface Props {
+  name: IconName;
+  size?: number;
+  strokeWidth?: number;
+  class?: string;
+}
+
+const {
+  name,
+  size = 16,
+  strokeWidth = 1.5,
+  class: className = "",
+} = Astro.props;
+
+function extractInnerSvg(raw: string): string {
+  return raw
+    .replace(/^[\s\S]*?<svg[^>]*>/i, "")
+    .replace(/<\/svg>\s*$/i, "")
+    .trim();
+}
+
+const innerSvg = extractInnerSvg(ICONS[name]);
+---
+
+<svg
+  class:list={["iconoir-svg", className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke-width={strokeWidth}
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  set:html={innerSvg}
+/>
+
+<style>
+.iconoir-svg {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+</style>

@@ -1,4 +1,6 @@
 ---
+import Icon from "@/components/Icon.astro";
+
 interface DistroOption {
   id: string;
   label: string;
@@ -64,7 +66,13 @@ const options: DistroOption[] = [
       data-copy-btn
       aria-label="Copy install command"
     >
-      Copy
+      <span class="copy-icon-wrap copy-icon-default" aria-hidden="true">
+        <Icon name="copy" size={15} />
+      </span>
+      <span class="copy-icon-wrap copy-icon-done" aria-hidden="true">
+        <Icon name="check" size={15} />
+      </span>
+      <span data-copy-label>Copy</span>
     </button>
   </div>
 
@@ -85,8 +93,9 @@ function initInstallWidgets(): void {
     );
     const noteEl = widget.querySelector<HTMLElement>("[data-install-note]");
     const copyBtn = widget.querySelector<HTMLButtonElement>("[data-copy-btn]");
+    const copyLabel = widget.querySelector<HTMLElement>("[data-copy-label]");
 
-    if (!commandEl || !noteEl || !copyBtn) continue;
+    if (!commandEl || !noteEl || !copyBtn || !copyLabel) continue;
 
     let resetTimer = 0;
 
@@ -98,7 +107,8 @@ function initInstallWidgets(): void {
         tab.setAttribute("aria-selected", "true");
         commandEl.textContent = tab.dataset.command ?? "";
         noteEl.textContent = tab.dataset.note ?? "";
-        copyBtn.textContent = "Copy";
+        copyBtn.classList.remove("is-copied");
+        copyLabel.textContent = "Copy";
       });
     }
 
@@ -108,13 +118,16 @@ function initInstallWidgets(): void {
 
       try {
         await navigator.clipboard.writeText(text);
-        copyBtn.textContent = "Copied";
+        copyBtn.classList.add("is-copied");
+        copyLabel.textContent = "Copied";
         window.clearTimeout(resetTimer);
         resetTimer = window.setTimeout(() => {
-          copyBtn.textContent = "Copy";
+          copyBtn.classList.remove("is-copied");
+          copyLabel.textContent = "Copy";
         }, 1600);
       } catch {
-        copyBtn.textContent = "Select manually";
+        copyBtn.classList.remove("is-copied");
+        copyLabel.textContent = "Select manually";
       }
     });
   }
@@ -207,9 +220,13 @@ initInstallWidgets();
 
 .copy-btn {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex-shrink: 0;
   height: 32px;
-  padding-inline: 12px;
+  padding-inline: 11px;
   border-radius: 4px;
   border: 1px solid var(--border-strong);
   background-color: transparent;
@@ -224,6 +241,29 @@ initInstallWidgets();
     color 140ms ease;
 }
 
+.copy-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn .copy-icon-done {
+  display: none;
+}
+
+.copy-btn.is-copied {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.copy-btn.is-copied .copy-icon-default {
+  display: none;
+}
+
+.copy-btn.is-copied .copy-icon-done {
+  display: inline-flex;
+}
+
 .copy-btn:hover {
   background-color: var(--ink-primary);
   border-color: var(--ink-primary);
@@ -236,7 +276,7 @@ initInstallWidgets();
   line-height: 1.5;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   .install-tabs {
     gap: 18px;
   }
@@ -246,7 +286,20 @@ initInstallWidgets();
   }
 
   .command-strip {
+    align-items: flex-start;
     padding: 10px 12px;
+  }
+
+  .command-line {
+    align-items: flex-start;
+    overflow-x: visible;
+    padding-top: 4px;
+  }
+
+  .command-code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
   }
 }
 

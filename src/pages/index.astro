@@ -1,82 +1,136 @@
 ---
 import DitherCard from "@/components/DitherCard.astro";
 import GoattyLogo from "@/components/GoattyLogo.astro";
+import Icon, { type IconName } from "@/components/Icon.astro";
 import InstallBar from "@/components/InstallBar.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-interface PillarTab {
+interface StackItem {
+  icon: IconName;
+  area: string;
+  capability: string;
+  replacesSetup: string;
+}
+
+interface InsideItem {
   id: string;
   label: string;
   heading: string;
-  body: string;
-  lines: readonly string[];
+  claim: string;
+  examples: readonly { key: string; value: string }[];
 }
 
-const pillars: PillarTab[] = [
+interface RemoteItem {
+  label: string;
+  heading: string;
+  body: string;
+}
+
+const stackLayers: StackItem[] = [
+  {
+    icon: "terminal",
+    area: "Shell layer",
+    capability: "Managed Zsh out of the box",
+    replacesSetup: "No oh-my-zsh boilerplate or ~/.zshrc edits",
+  },
+  {
+    icon: "control-slider",
+    area: "Settings",
+    capability: "Visual GPUI controls",
+    replacesSetup: "No config syntax, TOML, or Lua to memorize",
+  },
+  {
+    icon: "circle-spark",
+    area: "Prompt & search",
+    capability: "Starship & fzf-tab pre-wired",
+    replacesSetup: "No manual plugin sourcing or theme scripts",
+  },
+  {
+    icon: "cpu",
+    area: "Background agents",
+    capability: "Persistent goattyd sessions",
+    replacesSetup: "No tmux or screen wrappers just to keep jobs alive",
+  },
+  {
+    icon: "server-connection",
+    area: "Remote hosts",
+    capability: "Tailscale pairing & SSH sync",
+    replacesSetup: "No copying dotfiles to every server you touch",
+  },
+  {
+    icon: "shortcut-square",
+    area: "Shortcuts & PATH",
+    capability: "Desktop keys & GUI PATH toggles",
+    replacesSetup: "No hand-edited PATH exports or cryptic keycodes",
+  },
+];
+
+const insideItems: InsideItem[] = [
   {
     id: "zsh",
-    label: "Managed .zsh",
-    heading: "Autocomplete, syntax check, and snippets built in",
-    body: "Inline suggestions, fuzzy history search, and plain-English snippets work immediately without editing ~/.zshrc.",
-    lines: [
-      "$ | first 20 lines     ->  | head -n 20",
-      "highlighting   valid commands green, typos red",
-      "history        fuzzy search via fzf",
+    label: "Snippets & checks",
+    heading: "Type intent in plain English",
+    claim:
+      "Write natural phrases inline and watch valid commands highlight before you press Enter.",
+    examples: [
+      { key: "snippet", value: "| first 20 lines → | head -n 20" },
+      { key: "syntax", value: "green for valid, red for typos" },
+      { key: "history", value: "fuzzy recall via fzf" },
     ],
   },
   {
     id: "gui",
-    label: "GPUI Settings",
-    heading: "Visual controls for themes, PATH, and aliases",
-    body: "Open Settings to adjust fonts, prompt style, PATH folders, and aliases — no config syntax to memorize.",
-    lines: [
-      "Settings  >  GPUI Controls",
-      "PATH manager    add, reorder, toggle folders",
-      "profiles        switch & roll back any change",
+    label: "Visual settings",
+    heading: "Toggle PATH and rollback profiles",
+    claim:
+      "Reorder PATH folders, switch prompt styles, or undo any change visually in GPUI Settings.",
+    examples: [
+      { key: "PATH", value: "add, reorder, or disable entries" },
+      { key: "profiles", value: "switch & roll back safely" },
+      { key: "safety", value: "~/.zshrc stays untouched" },
     ],
   },
   {
     id: "editor",
-    label: "Editor feel",
-    heading: "Ctrl+C, Ctrl+V, and pane search",
-    body: "Copy and paste work with standard desktop shortcuts, and scrollback search behaves like a text editor.",
-    lines: [
-      "copy / paste    Ctrl+C (selection) & Ctrl+V",
-      "pane search     find inside scrollback instantly",
-      "keybinds        rebind any shortcut in Settings",
+    label: "Shortcuts",
+    heading: "Selection copy and instant search",
+    claim:
+      "Desktop copy/paste works on selected text while scrollback search behaves like an editor.",
+    examples: [
+      { key: "Ctrl+C / V", value: "copy selection, paste anywhere" },
+      { key: "find", value: "jump through scrollback matches" },
+      { key: "keybinds", value: "rebind shortcuts in Settings" },
     ],
   },
   {
     id: "plugins",
-    label: "One-click plugins",
-    heading: "Curated shell tools without package guesswork",
-    body: "Install fzf, starship, autosuggestions, and highlighting inside goatty — no root or manual sourcing.",
-    lines: [
-      "included        autosuggestions, fzf, starship",
-      "setup           toggle on or off in Settings",
-      "safety          ~/.zshrc stays untouched",
+    label: "Curated plugins",
+    heading: "One-click tools, zero root needed",
+    claim:
+      "Toggle autosuggestions, syntax highlighting, fzf, and Starship individually from Settings.",
+    examples: [
+      { key: "included", value: "autosuggestions, fzf, starship" },
+      { key: "updates", value: "managed cleanly inside goatty" },
+      { key: "install", value: "no package guesswork or root" },
     ],
   },
 ];
 
-const replacements = [
+const remoteItems: RemoteItem[] = [
   {
-    oldTool: "oh-my-zsh & .zshrc tweaks",
-    newWay: "Managed Zsh out of the box",
+    label: "Tailscale & SSH",
+    heading: "Same shell on every host",
+    body: "Pair over Tailscale or connect via SSH and carry your exact prompt, aliases, and snippets without copying dotfiles.",
   },
   {
-    oldTool: "Starship & manual theming",
-    newWay: "Visual GUI prompt & themes",
-  },
-  { oldTool: "fzf + history setup", newWay: "Fuzzy history & fzf-tab ready" },
-  { oldTool: "tmux / screen", newWay: "Persistent goattyd sessions" },
-  {
-    oldTool: "Manual SSH & Mosh config",
-    newWay: "Tailscale pairing & SSH sync",
+    label: "Lazy scrollback",
+    heading: "Snappy over weak Wi-Fi",
+    body: "Syncs the active viewport first and streams older history on scroll for a Mosh-like feel with zero extra setup.",
   },
   {
-    oldTool: "Hand-edited PATH & aliases",
-    newWay: "GUI PATH, aliases & snippets",
+    label: "Background AI",
+    heading: "Sessions outlive the window",
+    body: "Close Goatty anytime while Claude Code, Codex, OpenCode, or Antigravity stay active in goattyd with live tab alerts.",
   },
 ];
 ---
@@ -86,7 +140,7 @@ const replacements = [
   description="A GPU-rendered terminal with zero-config managed Zsh, visual GUI settings, Tailscale and SSH host sync, and persistent background sessions."
 >
   <div class="nav-wrap">
-    <header class="floating-pill">
+    <header class="floating-pill" data-floating-pill>
       <a href="/" class="brand-link" aria-label="goatty home">
         <GoattyLogo size={24} />
       </a>
@@ -105,7 +159,8 @@ const replacements = [
         rel="noopener noreferrer"
         class="pill-cta"
       >
-        GitHub
+        <Icon name="github" size={15} />
+        <span>GitHub</span>
       </a>
     </header>
   </div>
@@ -132,10 +187,12 @@ const replacements = [
               rel="noopener noreferrer"
               class="btn btn-primary"
             >
-              Download release
+              <Icon name="download" size={16} />
+              <span>Download release</span>
             </a>
             <a href="/docs/getting-started" class="btn btn-secondary">
-              Read the docs
+              <Icon name="book" size={16} />
+              <span>Read the docs</span>
             </a>
             <a
               href="https://github.com/goatty-dev/goatty"
@@ -143,7 +200,8 @@ const replacements = [
               rel="noopener noreferrer"
               class="btn btn-secondary"
             >
-              View on GitHub
+              <Icon name="github" size={16} />
+              <span>View on GitHub</span>
             </a>
           </div>
         </div>
@@ -161,28 +219,28 @@ const replacements = [
             <DitherCard
               scene="zsh-layers"
               title="Managed .zsh out of the box"
-              description="Autocomplete, syntax checks, Starship prompts, fzf history, and guided snippets ready on first launch."
+              description="Inline suggestions, syntax checks, Starship, and fzf history ready on first launch."
             />
           </div>
           <div data-reveal data-reveal-delay="80">
             <DitherCard
               scene="gui-plugins"
-              title="Every setting in the GUI"
-              description="Edit themes, fonts, PATH, aliases, snippets, and plugins visually — no config files to learn."
+              title="Every control in GPUI"
+              description="Configure themes, fonts, PATH, aliases, and plugins visually without touching dotfiles."
             />
           </div>
           <div data-reveal data-reveal-delay="160">
             <DitherCard
               scene="key-matrix"
-              title="Ctrl+C, Ctrl+V, and pane search"
-              description="Desktop copy/paste shortcuts work by default, with editor-style search and instant keybind edits."
+              title="Desktop copy, paste, and search"
+              description="Ctrl+C on selection, Ctrl+V paste, editor-style find, and GUI keybind editing."
             />
           </div>
           <div data-reveal data-reveal-delay="240">
             <DitherCard
               scene="ssh-bridge"
-              title="Same shell on every host"
-              description="Connect via Tailscale or SSH and keep your exact Zsh, prompt, and plugins on remote machines."
+              title="Portable across machines"
+              description="Connect via Tailscale or SSH and keep the same prompt, tools, and active daemon sessions."
             />
           </div>
         </div>
@@ -192,51 +250,56 @@ const replacements = [
     <section id="replaces" class="replaces" data-reveal>
       <div class="container replaces-grid">
         <div class="replaces-intro">
-          <h2>Six tools replaced by one terminal</h2>
+          <h2>One unified stack, zero dotfile glue</h2>
           <p>
-            Skip wiring prompts, plugins, and multiplexers by hand — everything
-            ships built in and editable in Settings.
+            Instead of wiring prompts, plugins, and multiplexers by hand, Goatty
+            ships them together with visual controls in Settings.
           </p>
           <p class="replaces-note">
             Similar in spirit to <strong>Rex Terminal</strong> by Superlogical,
-            Goatty takes a beginner-first path:{" "}
-            <strong>no Lua to learn</strong>, visual theming, and your exact
-            managed shell synced across hosts.
+            built beginner-first: <strong>no Lua to learn</strong>, visual
+            theming, and the same managed shell across hosts.
           </p>
         </div>
 
-        <dl class="replace-list">
-          {replacements.map((item) => (
-            <div class="replace-row">
-              <dt>{item.oldTool}</dt>
-              <dd>{item.newWay}</dd>
-            </div>
+        <ul class="stack-grid">
+          {stackLayers.map((item) => (
+            <li class="stack-item">
+              <p class="stack-label pixel-text">{item.area}</p>
+              <div class="stack-head">
+                <Icon name={item.icon} size={17} class="stack-icon" />
+                <h3>{item.capability}</h3>
+              </div>
+              <p class="stack-desc">{item.replacesSetup}</p>
+            </li>
           ))}
-        </dl>
+        </ul>
       </div>
     </section>
 
     <section id="shell" class="explorer" data-reveal>
       <div class="container">
         <div class="explorer-head">
-          <h2>See how the pieces fit</h2>
+          <h2>Inside a fresh session</h2>
           <p>
-            Everything beginners need works from your first command — no dotfile
-            boilerplate.
+            One clear workflow per layer, ready from your very first command.
           </p>
         </div>
 
         <div class="pieces-grid">
-          {pillars.map((pillar) => (
+          {insideItems.map((item) => (
             <div class="piece-item">
-              <p class="piece-kicker pixel-text">{pillar.label}</p>
-              <h3>{pillar.heading}</h3>
-              <p class="piece-body">{pillar.body}</p>
-              <div class="piece-preview">
-                {pillar.lines.slice(0, 3).map((line) => (
-                  <div class="preview-line">{line}</div>
+              <p class="piece-kicker pixel-text">{item.label}</p>
+              <h3>{item.heading}</h3>
+              <p class="piece-body">{item.claim}</p>
+              <dl class="piece-preview">
+                {item.examples.map((ex) => (
+                  <div class="preview-row">
+                    <dt>{ex.key}</dt>
+                    <dd>{ex.value}</dd>
+                  </div>
                 ))}
-              </div>
+              </dl>
             </div>
           ))}
         </div>
@@ -245,32 +308,17 @@ const replacements = [
 
     <section id="remote" class="remote-strip">
       <div class="container strip-grid">
-        <div class="strip-item" data-reveal data-reveal-delay="0">
-          <p class="strip-kicker pixel-text">Tailscale & SSH</p>
-          <h3>One shell across every host</h3>
-          <p>
-            Pair over Tailscale or connect via SSH. Your prompt, aliases, and
-            plugins follow you without manual dotfile syncing.
-          </p>
-        </div>
-
-        <div class="strip-item" data-reveal data-reveal-delay="90">
-          <p class="strip-kicker pixel-text">Fast remote sync</p>
-          <h3>Lazy scrollback, Mosh-style feel</h3>
-          <p>
-            Only the active screen syncs immediately while history loads on
-            scroll, keeping typing snappy on weak Wi-Fi.
-          </p>
-        </div>
-
-        <div class="strip-item" data-reveal data-reveal-delay="180">
-          <p class="strip-kicker pixel-text">Background AI</p>
-          <h3>Agents stay running when closed</h3>
-          <p>
-            Close Goatty anytime while Claude Code, Codex, OpenCode, or
-            Antigravity keep running in goattyd with live tab alerts.
-          </p>
-        </div>
+        {remoteItems.map((item, idx) => (
+          <div
+            class="strip-item"
+            data-reveal
+            data-reveal-delay={String(idx * 90)}
+          >
+            <p class="strip-kicker pixel-text">{item.label}</p>
+            <h3>{item.heading}</h3>
+            <p>{item.body}</p>
+          </div>
+        ))}
       </div>
     </section>
 
@@ -287,9 +335,13 @@ const replacements = [
             planned.
           </p>
           <div class="closing-actions">
-            <a href="#install" class="btn btn-primary">Install on Linux</a>
+            <a href="#install" class="btn btn-primary">
+              <Icon name="download" size={16} />
+              <span>Install on Linux</span>
+            </a>
             <a href="/docs/getting-started" class="btn btn-secondary">
-              Read the docs
+              <Icon name="book" size={16} />
+              <span>Read the docs</span>
             </a>
           </div>
         </div>
@@ -340,6 +392,18 @@ import { initDitherCanvases, initDitherWordmark } from "@/scripts/dither3d";
 initDitherCanvases();
 initDitherWordmark();
 
+// Subtle elevation cue on floating pill once scrolled past top
+const floatingPill = document.querySelector<HTMLElement>(
+  "[data-floating-pill]",
+);
+if (floatingPill) {
+  const syncNavScroll = () => {
+    floatingPill.classList.toggle("is-scrolled", window.scrollY > 12);
+  };
+  syncNavScroll();
+  window.addEventListener("scroll", syncNavScroll, { passive: true });
+}
+
 // Smooth scroll reveal for below-the-fold sections
 const revealEls = document.querySelectorAll<HTMLElement>("[data-reveal]");
 const reducedMotion = window.matchMedia(
@@ -388,7 +452,7 @@ if (reducedMotion || !("IntersectionObserver" in window)) {
   transform: translateY(0);
 }
 
-/* Modern Floating Pill Navbar (solid matte, zero glass blur, zero weird shadows) */
+/* Floating Pill Navbar with subtle scroll elevation */
 .nav-wrap {
   position: sticky;
   top: 16px;
@@ -409,6 +473,18 @@ if (reducedMotion || !("IntersectionObserver" in window)) {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.floating-pill.is-scrolled {
+  background-color: #121217;
+  border-color: #32323c;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .brand-link {
@@ -438,8 +514,9 @@ if (reducedMotion || !("IntersectionObserver" in window)) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 7px;
   height: 36px;
-  padding-inline: 16px;
+  padding-inline: 15px;
   border-radius: 999px;
   background-color: var(--ink-primary);
   color: var(--bg-canvas);
@@ -526,18 +603,13 @@ h1 {
   color: var(--ink-primary);
 }
 
-.section-head p {
-  font-size: 0.875rem;
-  color: var(--ink-muted);
-}
-
 .showcase-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 44px 28px;
 }
 
-/* What it replaces (open scannable 2-col layout) */
+/* Unified stack section */
 .replaces {
   padding-bottom: clamp(72px, 9vw, 120px);
 }
@@ -579,42 +651,60 @@ h1 {
   font-weight: 500;
 }
 
-.replace-list {
+.stack-grid {
+  list-style: none;
   margin: 0;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px 32px;
+  gap: 24px 32px;
 }
 
-.replace-row {
+.stack-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hairline);
 }
 
-.replace-row dt {
-  font-size: 0.8125rem;
+.stack-label {
+  font-size: 0.72rem;
   color: var(--ink-muted);
-  text-decoration: line-through;
-  text-decoration-color: #3a3a45;
 }
 
-.replace-row dd {
-  margin: 0;
+.stack-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stack-icon {
+  color: var(--accent-orange);
+}
+
+.stack-head h3 {
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: -0.015em;
+  line-height: 1.3;
   color: var(--ink-primary);
 }
 
-/* Interactive Shell / GUI Explorer */
+.stack-desc {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* Inside a fresh session */
 .explorer {
   padding-bottom: clamp(72px, 9vw, 120px);
 }
 
 .explorer-head {
   max-width: 58ch;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .explorer-head h2 {
@@ -665,31 +755,39 @@ h1 {
 }
 
 .piece-preview {
-  margin-top: 6px;
+  margin: 6px 0 0;
   padding-left: 14px;
   border-left: 2px solid var(--border-hairline);
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  line-height: 1.7;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview-row {
+  display: grid;
+  grid-template-columns: 7.25rem minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: baseline;
+}
+
+.preview-row dt {
+  color: var(--ink-muted);
+}
+
+.preview-row dd {
+  margin: 0;
   color: var(--ink-secondary);
-  max-width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow-wrap: anywhere;
 }
 
-.piece-preview::-webkit-scrollbar {
-  display: none;
-}
-
-.preview-line {
-  white-space: pre;
-}
-
-.preview-line:first-child {
+.preview-row:first-child dd {
   color: var(--ink-primary);
 }
 
-/* 3-column Remote & AI Agent Strip (unboxed, scannable) */
+/* 3-column Remote & AI Agent Strip */
 .remote-strip {
   padding-bottom: clamp(72px, 9vw, 120px);
 }
@@ -855,7 +953,7 @@ h1 {
     gap: 14px;
   }
 
-  .replace-list {
+  .stack-grid {
     grid-template-columns: 1fr;
     gap: 18px;
   }
@@ -867,8 +965,17 @@ h1 {
 
 @media (max-width: 520px) {
   .piece-preview {
-    font-size: 0.7rem;
-    padding-left: 10px;
+    font-size: 0.78rem;
+    padding-left: 12px;
+  }
+
+  .preview-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .preview-row dt {
+    font-size: 0.72rem;
   }
 }
 
@@ -885,6 +992,7 @@ h1 {
     transition: none;
   }
 
+  .floating-pill,
   .pill-nav a,
   .pill-cta,
   .footer-links a {

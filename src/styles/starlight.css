@@ -274,8 +274,10 @@
 
   /* Tables */
   .sl-markdown-content table:not(:where(.not-content *)) {
+    display: table;
     width: 100%;
     border-collapse: collapse;
+    overflow: visible;
   }
 
   .sl-markdown-content th:not(:where(.not-content *)) {
@@ -291,6 +293,23 @@
   .sl-markdown-content td:not(:where(.not-content *)) {
     border-bottom: 1px solid #202026;
     color: #b2b2ba;
+    overflow-wrap: break-word;
+  }
+
+  .sl-markdown-content td code:not(:where(.not-content *)) {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 600px) {
+    .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+      padding: 0.55rem 0.5rem;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .sl-markdown-content th:not(:where(.not-content *)) {
+      font-size: 0.65rem;
+    }
   }
 
   /* Minimal matte Asides */
