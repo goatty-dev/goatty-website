@@ -31,6 +31,8 @@ html {
   font-size: 16px;
   line-height: 1.6;
   scroll-behavior: smooth;
+  /* Clear sticky floating pill navbar (16px top + 52px pill + 28px breathing room) */
+  scroll-padding-top: 96px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
