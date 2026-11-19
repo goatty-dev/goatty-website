@@ -1,0 +1,817 @@
+---
+import Icon from "@/components/Icon.astro";
+
+type Control =
+  | {
+      kind: "toggle";
+      id: string;
+      label: string;
+      help: string;
+      defaultChecked: boolean;
+    }
+  | {
+      kind: "choice";
+      id: string;
+      label: string;
+      help: string;
+      options: readonly string[];
+      defaultOption: string;
+    };
+
+interface PluginDemo {
+  id: string;
+  name: string;
+  source: "Registry" | "Built-in";
+  summary: string;
+  controls: readonly Control[];
+}
+
+const plugins: PluginDemo[] = [
+  {
+    id: "eza",
+    name: "eza",
+    source: "Registry",
+    summary: "A modern ls: colors, file icons, git status and a tree view",
+    controls: [
+      {
+        kind: "toggle",
+        id: "replace_ls",
+        label: "Use eza for ls",
+        help: "Alias ls to eza automatically inside goatty",
+        defaultChecked: true,
+      },
+      {
+        kind: "choice",
+        id: "icons",
+        label: "File icons",
+        help: "Show icons next to file and folder names",
+        options: ["Automatic", "Always", "Never"],
+        defaultOption: "Automatic",
+      },
+      {
+        kind: "choice",
+        id: "folders",
+        label: "Folders",
+        help: "Where directories appear in listings",
+        options: ["First", "Mixed", "Last"],
+        defaultOption: "First",
+      },
+      {
+        kind: "toggle",
+        id: "header",
+        label: "Column headers",
+        help: "Show a header row in long listings",
+        defaultChecked: false,
+      },
+    ],
+  },
+  {
+    id: "bat",
+    name: "bat",
+    source: "Registry",
+    summary:
+      "cat with wings: syntax highlighting, line numbers and git changes",
+    controls: [
+      {
+        kind: "choice",
+        id: "theme",
+        label: "Color theme",
+        help: "Follow your terminal palette or pick a preset",
+        options: ["ANSI", "Catppuccin", "OneHalf"],
+        defaultOption: "ANSI",
+      },
+      {
+        kind: "choice",
+        id: "style",
+        label: "Decorations",
+        help: "Line numbers, grid borders, and git markers",
+        options: ["Default", "Numbers", "Plain"],
+        defaultOption: "Default",
+      },
+      {
+        kind: "toggle",
+        id: "italic",
+        label: "Italic text",
+        help: "Render comments and emphasis in italics",
+        defaultChecked: true,
+      },
+      {
+        kind: "choice",
+        id: "paging",
+        label: "Pager",
+        help: "Page output that exceeds one screen",
+        options: ["Auto", "Always", "Never"],
+        defaultOption: "Auto",
+      },
+    ],
+  },
+  {
+    id: "zoxide",
+    name: "zoxide",
+    source: "Registry",
+    summary: "Jump to directories you use often: z proj instead of cd",
+    controls: [
+      {
+        kind: "choice",
+        id: "command",
+        label: "Command",
+        help: "Add z alongside cd or replace cd directly",
+        options: ["z", "cd"],
+        defaultOption: "z",
+      },
+      {
+        kind: "choice",
+        id: "hook",
+        label: "When to learn",
+        help: "How frequently visited directories are ranked",
+        options: ["On cd", "Every prompt"],
+        defaultOption: "On cd",
+      },
+      {
+        kind: "toggle",
+        id: "echo",
+        label: "Show where you jumped",
+        help: "Print the resolved path after switching",
+        defaultChecked: false,
+      },
+      {
+        kind: "toggle",
+        id: "symlinks",
+        label: "Follow symlinks",
+        help: "Resolve links before recording a directory",
+        defaultChecked: false,
+      },
+    ],
+  },
+  {
+    id: "fzf",
+    name: "fzf",
+    source: "Built-in",
+    summary: "Fuzzy search: Ctrl+R history, Ctrl+T files, Alt+C directories",
+    controls: [
+      {
+        kind: "toggle",
+        id: "hidden_files",
+        label: "Hidden files too",
+        help: "Include dotfiles in Ctrl+T file search",
+        defaultChecked: true,
+      },
+      {
+        kind: "toggle",
+        id: "previews",
+        label: "Previews",
+        help: "Show file contents alongside search matches",
+        defaultChecked: true,
+      },
+      {
+        kind: "choice",
+        id: "history",
+        label: "History recall",
+        help: "Bind fuzzy command history search",
+        options: ["Ctrl+R", "Off"],
+        defaultOption: "Ctrl+R",
+      },
+    ],
+  },
+];
+
+const steps = [
+  {
+    num: "01",
+    heading: "A GUI for every setting",
+    body: "Themes, fonts, keybinds, PATH, and prompts live in one searchable GPUI window — with profiles and instant rollback so you can tweak anything safely.",
+  },
+  {
+    num: "02",
+    heading: "Plugins become native settings",
+    body: "Add CLI tools like eza, bat, zoxide, ripgrep, or lazygit in one click. Each plugin renders real controls, completions, and palette actions — no root needed.",
+  },
+  {
+    num: "03",
+    heading: "Copied to every host automatically",
+    body: "Connect to a remote server and Goatty syncs your enabled plugins and their GUI settings along with you, so every machine feels like home on first prompt.",
+  },
+];
+---
+
+<section id="plugins" class="plugins-section">
+  <div class="container">
+    <div class="gui-grid" data-plugin-demo>
+      <div class="gui-intro">
+        <p class="gui-kicker pixel-text">GUI settings &amp; plugins</p>
+        <h2>Every tool gets a real settings page.</h2>
+        <p class="gui-lead">
+          Configure your terminal, shell, and installed tools visually in GPUI —
+          no dotfiles or Lua to edit. Add any CLI tool via plugins and Goatty
+          carries its settings to every host you connect to.
+        </p>
+
+        <div class="picker-block">
+          <span class="picker-label pixel-text">Inspect a plugin</span>
+          <div class="picker-tabs" role="tablist" aria-label="Plugin preview">
+            {plugins.map((plugin, idx) => (
+              <button
+                type="button"
+                role="tab"
+                class="picker-tab"
+                aria-selected={idx === 0 ? "true" : "false"}
+                aria-controls={`plugin-panel-${plugin.id}`}
+                id={`plugin-tab-${plugin.id}`}
+                data-plugin-tab={plugin.id}
+              >
+                <span class="picker-name">{plugin.name}</span>
+                {plugin.source === "Built-in" && (
+                  <span class="picker-tag">built-in</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p class="gui-beginner-note">
+          Built-in plugins like syntax highlighting, autosuggestions, Starship,
+          and fzf give beginners a friendly shell on day one — alongside 25+
+          tools in the plugin registry.
+        </p>
+      </div>
+
+      <div class="settings-window">
+        <div class="win-bar">
+          <div class="win-crumb">
+            <Icon name="settings" size={14} class="win-icon" />
+            <span class="win-path">Settings</span>
+            <span class="win-sep" aria-hidden="true">/</span>
+            <span class="win-path">Plugins</span>
+            <span class="win-sep" aria-hidden="true">/</span>
+            <strong class="win-current" data-win-name>{plugins[0].name}</strong>
+          </div>
+          <div class="win-badges">
+            <span class="win-source" data-win-source>{plugins[0].source}</span>
+            <span class="win-enabled">
+              <span class="win-dot" aria-hidden="true" />
+              Enabled
+            </span>
+          </div>
+        </div>
+
+        <div class="win-body">
+          {plugins.map((plugin, idx) => (
+            <div
+              class="win-panel"
+              id={`plugin-panel-${plugin.id}`}
+              role="tabpanel"
+              aria-labelledby={`plugin-tab-${plugin.id}`}
+              data-plugin-panel={plugin.id}
+              data-plugin-name={plugin.name}
+              data-plugin-source={plugin.source}
+              hidden={idx !== 0}
+            >
+              <p class="win-summary">{plugin.summary}</p>
+              <div class="win-rows">
+                {plugin.controls.map((ctrl) => (
+                  <div class="win-row">
+                    <div class="win-row-copy">
+                      <span class="win-row-label">{ctrl.label}</span>
+                      <span class="win-row-help">{ctrl.help}</span>
+                    </div>
+
+                    {ctrl.kind === "toggle" ? (
+                      <button
+                        type="button"
+                        role="switch"
+                        class="gui-switch"
+                        aria-checked={ctrl.defaultChecked ? "true" : "false"}
+                        aria-label={ctrl.label}
+                        data-gui-switch
+                      >
+                        <span class="gui-switch-thumb" />
+                      </button>
+                    ) : (
+                      <fieldset class="gui-segmented" aria-label={ctrl.label}>
+                        {ctrl.options.map((opt) => (
+                          <button
+                            type="button"
+                            class="gui-seg-btn"
+                            aria-pressed={
+                              opt === ctrl.defaultOption ? "true" : "false"
+                            }
+                            data-gui-seg
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </fieldset>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="win-foot">
+          <div class="win-sync" data-sync-status>
+            <Icon name="refresh-double" size={14} class="win-sync-icon" />
+            <span data-sync-text>Auto-synced to every remote host</span>
+          </div>
+          <span class="win-safe">~/.zshrc untouched</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillars-grid">
+      {steps.map((step) => (
+        <div class="pillar-item">
+          <span class="pillar-num pixel-text">{step.num}</span>
+          <h3>{step.heading}</h3>
+          <p>{step.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+function initPluginDemos(): void {
+  const roots = document.querySelectorAll<HTMLElement>("[data-plugin-demo]");
+
+  for (const root of roots) {
+    const tabs = root.querySelectorAll<HTMLButtonElement>("[data-plugin-tab]");
+    const panels = root.querySelectorAll<HTMLElement>("[data-plugin-panel]");
+    const winName = root.querySelector<HTMLElement>("[data-win-name]");
+    const winSource = root.querySelector<HTMLElement>("[data-win-source]");
+    const syncWrap = root.querySelector<HTMLElement>("[data-sync-status]");
+    const syncText = root.querySelector<HTMLElement>("[data-sync-text]");
+
+    let syncTimer = 0;
+    const pulseSync = () => {
+      if (!syncWrap || !syncText) return;
+      syncWrap.classList.add("is-syncing");
+      syncText.textContent = "Updated · ready to sync on connect";
+      window.clearTimeout(syncTimer);
+      syncTimer = window.setTimeout(() => {
+        syncWrap.classList.remove("is-syncing");
+        syncText.textContent = "Auto-synced to every remote host";
+      }, 2000);
+    };
+
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => {
+        const targetId = tab.dataset.pluginTab;
+        for (const other of tabs) {
+          other.setAttribute("aria-selected", String(other === tab));
+        }
+        for (const panel of panels) {
+          const isMatch = panel.dataset.pluginPanel === targetId;
+          panel.hidden = !isMatch;
+          if (isMatch) {
+            if (winName) winName.textContent = panel.dataset.pluginName ?? "";
+            if (winSource) {
+              winSource.textContent = panel.dataset.pluginSource ?? "";
+            }
+          }
+        }
+      });
+    }
+
+    const switches =
+      root.querySelectorAll<HTMLButtonElement>("[data-gui-switch]");
+    for (const sw of switches) {
+      sw.addEventListener("click", () => {
+        const next = sw.getAttribute("aria-checked") !== "true";
+        sw.setAttribute("aria-checked", String(next));
+        pulseSync();
+      });
+    }
+
+    const segGroups = root.querySelectorAll<HTMLElement>(".gui-segmented");
+    for (const group of segGroups) {
+      const buttons =
+        group.querySelectorAll<HTMLButtonElement>("[data-gui-seg]");
+      for (const btn of buttons) {
+        btn.addEventListener("click", () => {
+          for (const other of buttons) {
+            other.setAttribute("aria-pressed", String(other === btn));
+          }
+          pulseSync();
+        });
+      }
+    }
+  }
+}
+
+initPluginDemos();
+</script>
+
+<style>
+.plugins-section {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.gui-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 36px 52px;
+  align-items: start;
+}
+
+.gui-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gui-kicker {
+  font-size: 0.75rem;
+  color: var(--accent-orange);
+}
+
+.gui-intro h2 {
+  font-size: clamp(1.5rem, 2.7vw, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.14;
+  max-width: 18ch;
+  color: var(--ink-primary);
+}
+
+.gui-lead {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  max-width: 44ch;
+}
+
+.picker-block {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.picker-label {
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+}
+
+.picker-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.picker-tab {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding-inline: 13px;
+  border-radius: 5px;
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+  color: var(--ink-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.picker-tab:hover {
+  border-color: var(--border-strong);
+  color: var(--ink-primary);
+}
+
+.picker-tab[aria-selected="true"] {
+  border-color: var(--accent-orange);
+  background-color: rgba(255, 90, 0, 0.08);
+  color: var(--ink-primary);
+}
+
+.picker-tag {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background-color: #17171d;
+}
+
+.picker-tab[aria-selected="true"] .picker-tag {
+  color: var(--accent-orange);
+  background-color: rgba(255, 90, 0, 0.14);
+}
+
+.gui-beginner-note {
+  margin-top: 6px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  max-width: 44ch;
+}
+
+/* Interactive GPUI Settings window mockup */
+.settings-window {
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background-color: #0d0d10;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.win-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background-color: #121216;
+  border-bottom: 1px solid var(--border-hairline);
+  flex-wrap: wrap;
+}
+
+.win-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8125rem;
+}
+
+.win-icon {
+  color: var(--ink-muted);
+}
+
+.win-path {
+  color: var(--ink-muted);
+}
+
+.win-sep {
+  color: #3a3a45;
+}
+
+.win-current {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--ink-primary);
+}
+
+.win-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.win-source {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-hairline);
+  background-color: #0c0c0f;
+}
+
+.win-enabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--ink-secondary);
+}
+
+.win-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: #34c77b;
+}
+
+.win-body {
+  padding: 16px 20px 8px;
+}
+
+.win-summary {
+  font-size: 0.84rem;
+  color: var(--ink-muted);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.win-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.win-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding-block: 14px;
+}
+
+.win-row + .win-row {
+  border-top: 1px solid #18181e;
+}
+
+.win-row-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.win-row-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-primary);
+  line-height: 1.3;
+}
+
+.win-row-help {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+
+/* Native-style toggle switch */
+.gui-switch {
+  appearance: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background-color: #18181f;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.gui-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background-color: var(--ink-secondary);
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 150ms ease;
+}
+
+.gui-switch[aria-checked="true"] {
+  background-color: var(--accent-orange);
+  border-color: var(--accent-orange);
+}
+
+.gui-switch[aria-checked="true"] .gui-switch-thumb {
+  transform: translateX(16px);
+  background-color: var(--bg-canvas);
+}
+
+/* Segmented choice control */
+.gui-segmented {
+  display: inline-flex;
+  margin: 0;
+  min-width: 0;
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--border-hairline);
+  background-color: #09090b;
+  flex-shrink: 0;
+}
+
+.gui-seg-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.gui-seg-btn:hover {
+  color: var(--ink-primary);
+}
+
+.gui-seg-btn[aria-pressed="true"] {
+  background-color: #1c1c23;
+  color: var(--ink-primary);
+}
+
+.win-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 18px;
+  background-color: #0a0a0d;
+  border-top: 1px solid var(--border-hairline);
+  font-size: 0.78rem;
+}
+
+.win-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-secondary);
+  transition: color 150ms ease;
+}
+
+.win-sync-icon {
+  color: var(--accent-orange);
+}
+
+.win-sync.is-syncing {
+  color: var(--accent-orange);
+}
+
+.win-safe {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+/* Open numbered 01 / 02 / 03 three-column strip */
+.pillars-grid {
+  margin-top: 52px;
+  padding-top: 38px;
+  border-top: 1px solid var(--border-hairline);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 44px;
+}
+
+.pillar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pillar-num {
+  font-size: 1.05rem;
+  color: var(--accent-orange);
+}
+
+.pillar-item h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--ink-primary);
+}
+
+.pillar-item p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 920px) {
+  .gui-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 40px;
+    padding-top: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .win-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker-tab,
+  .gui-switch,
+  .gui-switch-thumb,
+  .gui-seg-btn,
+  .win-sync {
+    transition: none;
+  }
+}
+</style>

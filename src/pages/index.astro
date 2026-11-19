@@ -3,6 +3,8 @@ import DitherCard from "@/components/DitherCard.astro";
 import GoattyLogo from "@/components/GoattyLogo.astro";
 import Icon, { type IconName } from "@/components/Icon.astro";
 import InstallBar from "@/components/InstallBar.astro";
+import MultiplexerSection from "@/components/MultiplexerSection.astro";
+import PluginSettingsSection from "@/components/PluginSettingsSection.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 interface StackItem {
@@ -10,20 +12,6 @@ interface StackItem {
   area: string;
   capability: string;
   replacesSetup: string;
-}
-
-interface InsideItem {
-  id: string;
-  label: string;
-  heading: string;
-  claim: string;
-  examples: readonly { key: string; value: string }[];
-}
-
-interface RemoteItem {
-  label: string;
-  heading: string;
-  body: string;
 }
 
 const stackLayers: StackItem[] = [
@@ -64,80 +52,11 @@ const stackLayers: StackItem[] = [
     replacesSetup: "No hand-edited PATH exports or cryptic keycodes",
   },
 ];
-
-const insideItems: InsideItem[] = [
-  {
-    id: "zsh",
-    label: "Snippets & checks",
-    heading: "Type intent in plain English",
-    claim:
-      "Write natural phrases inline and watch valid commands highlight before you press Enter.",
-    examples: [
-      { key: "snippet", value: "| first 20 lines → | head -n 20" },
-      { key: "syntax", value: "green for valid, red for typos" },
-      { key: "history", value: "fuzzy recall via fzf" },
-    ],
-  },
-  {
-    id: "gui",
-    label: "Visual settings",
-    heading: "Toggle PATH and rollback profiles",
-    claim:
-      "Reorder PATH folders, switch prompt styles, or undo any change visually in GPUI Settings.",
-    examples: [
-      { key: "PATH", value: "add, reorder, or disable entries" },
-      { key: "profiles", value: "switch & roll back safely" },
-      { key: "safety", value: "~/.zshrc stays untouched" },
-    ],
-  },
-  {
-    id: "editor",
-    label: "Shortcuts",
-    heading: "Selection copy and instant search",
-    claim:
-      "Desktop copy/paste works on selected text while scrollback search behaves like an editor.",
-    examples: [
-      { key: "Ctrl+C / V", value: "copy selection, paste anywhere" },
-      { key: "find", value: "jump through scrollback matches" },
-      { key: "keybinds", value: "rebind shortcuts in Settings" },
-    ],
-  },
-  {
-    id: "plugins",
-    label: "Curated plugins",
-    heading: "One-click tools, zero root needed",
-    claim:
-      "Toggle autosuggestions, syntax highlighting, fzf, and Starship individually from Settings.",
-    examples: [
-      { key: "included", value: "autosuggestions, fzf, starship" },
-      { key: "updates", value: "managed cleanly inside goatty" },
-      { key: "install", value: "no package guesswork or root" },
-    ],
-  },
-];
-
-const remoteItems: RemoteItem[] = [
-  {
-    label: "Tailscale & SSH",
-    heading: "Same shell on every host",
-    body: "Pair over Tailscale or connect via SSH and carry your exact prompt, aliases, and snippets without copying dotfiles.",
-  },
-  {
-    label: "Lazy scrollback",
-    heading: "Snappy over weak Wi-Fi",
-    body: "Syncs the active viewport first and streams older history on scroll for a Mosh-like feel with zero extra setup.",
-  },
-  {
-    label: "Background AI",
-    heading: "Sessions outlive the window",
-    body: "Close Goatty anytime while Claude Code, Codex, OpenCode, or Antigravity stay active in goattyd with live tab alerts.",
-  },
-];
 ---
 
 <BaseLayout
-  title="goatty — Managed Zsh & GPU Terminal for Linux"
-  description="A GPU-rendered terminal with zero-config managed Zsh, visual GUI settings, Tailscale and SSH host sync, and persistent background sessions."
+  title="goatty — GPU Terminal with Built-In Multiplexer & GUI Settings"
+  description="A fast GPU-rendered terminal in Rust and GPUI with a built-in predictive multiplexer, visual GUI settings for every tool and plugin, and automatic host sync."
 >
   <div class="nav-wrap">
     <header class="floating-pill" data-floating-pill>
@@ -148,8 +67,8 @@ const remoteItems: RemoteItem[] = [
       <nav class="pill-nav" aria-label="Primary">
         <a href="#features">Features</a>
         <a href="#replaces">Stack</a>
-        <a href="#shell">Inside</a>
-        <a href="#remote">Remote</a>
+        <a href="#multiplexer">Multiplexer</a>
+        <a href="#plugins">Plugins</a>
         <a href="/docs/getting-started">Docs</a>
       </nav>
 
@@ -252,13 +171,12 @@ const remoteItems: RemoteItem[] = [
         <div class="replaces-intro">
           <h2>One unified stack, zero dotfile glue</h2>
           <p>
-            Instead of wiring prompts, plugins, and multiplexers by hand, Goatty
-            ships them together with visual controls in Settings.
+            Prompt, plugins, and session persistence ship together and work on
+            first launch.
           </p>
           <p class="replaces-note">
             Similar in spirit to <strong>Rex Terminal</strong> by Superlogical,
-            built beginner-first: <strong>no Lua to learn</strong>, visual
-            theming, and the same managed shell across hosts.
+            built beginner-first with visual theming.
           </p>
         </div>
 
@@ -277,50 +195,13 @@ const remoteItems: RemoteItem[] = [
       </div>
     </section>
 
-    <section id="shell" class="explorer" data-reveal>
-      <div class="container">
-        <div class="explorer-head">
-          <h2>Inside a fresh session</h2>
-          <p>
-            One clear workflow per layer, ready from your very first command.
-          </p>
-        </div>
+    <div data-reveal>
+      <MultiplexerSection />
+    </div>
 
-        <div class="pieces-grid">
-          {insideItems.map((item) => (
-            <div class="piece-item">
-              <p class="piece-kicker pixel-text">{item.label}</p>
-              <h3>{item.heading}</h3>
-              <p class="piece-body">{item.claim}</p>
-              <dl class="piece-preview">
-                {item.examples.map((ex) => (
-                  <div class="preview-row">
-                    <dt>{ex.key}</dt>
-                    <dd>{ex.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <section id="remote" class="remote-strip">
-      <div class="container strip-grid">
-        {remoteItems.map((item, idx) => (
-          <div
-            class="strip-item"
-            data-reveal
-            data-reveal-delay={String(idx * 90)}
-          >
-            <p class="strip-kicker pixel-text">{item.label}</p>
-            <h3>{item.heading}</h3>
-            <p>{item.body}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+    <div data-reveal>
+      <PluginSettingsSection />
+    </div>
 
     <section class="closing" data-reveal>
       <div class="container closing-inner">
@@ -697,133 +578,6 @@ h1 {
   color: var(--ink-muted);
 }
 
-/* Inside a fresh session */
-.explorer {
-  padding-bottom: clamp(72px, 9vw, 120px);
-}
-
-.explorer-head {
-  max-width: 58ch;
-  margin-bottom: 28px;
-}
-
-.explorer-head h2 {
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  font-weight: 600;
-  letter-spacing: -0.028em;
-  line-height: 1.16;
-}
-
-.explorer-head p {
-  margin-top: 10px;
-  font-size: 0.9375rem;
-  color: var(--ink-muted);
-  line-height: 1.6;
-}
-
-.pieces-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 44px 48px;
-}
-
-.piece-item {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.piece-kicker {
-  font-size: 0.75rem;
-  color: var(--accent-orange);
-}
-
-.piece-item h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.28;
-  color: var(--ink-primary);
-}
-
-.piece-body {
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--ink-muted);
-  max-width: 48ch;
-}
-
-.piece-preview {
-  margin: 6px 0 0;
-  padding-left: 14px;
-  border-left: 2px solid var(--border-hairline);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.preview-row {
-  display: grid;
-  grid-template-columns: 7.25rem minmax(0, 1fr);
-  gap: 4px 12px;
-  align-items: baseline;
-}
-
-.preview-row dt {
-  color: var(--ink-muted);
-}
-
-.preview-row dd {
-  margin: 0;
-  color: var(--ink-secondary);
-  overflow-wrap: anywhere;
-}
-
-.preview-row:first-child dd {
-  color: var(--ink-primary);
-}
-
-/* 3-column Remote & AI Agent Strip */
-.remote-strip {
-  padding-bottom: clamp(72px, 9vw, 120px);
-}
-
-.strip-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 36px 40px;
-}
-
-.strip-item {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.strip-kicker {
-  font-size: 0.75rem;
-  color: var(--accent-orange);
-}
-
-.strip-item h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.28;
-  color: var(--ink-primary);
-}
-
-.strip-item p {
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--ink-muted);
-}
-
 /* Bottom Dithered Font Artwork + Closing CTA */
 .closing {
   padding-bottom: clamp(64px, 8vw, 108px);
@@ -927,16 +681,10 @@ h1 {
     grid-template-columns: 1fr;
     gap: 28px;
   }
-
-  .strip-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
 }
 
 @media (max-width: 720px) {
-  .showcase-grid,
-  .pieces-grid {
+  .showcase-grid {
     grid-template-columns: 1fr;
     gap: 36px;
   }
@@ -960,22 +708,6 @@ h1 {
 
   .wordmark-stage {
     aspect-ratio: 12 / 5;
-  }
-}
-
-@media (max-width: 520px) {
-  .piece-preview {
-    font-size: 0.78rem;
-    padding-left: 12px;
-  }
-
-  .preview-row {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-
-  .preview-row dt {
-    font-size: 0.72rem;
   }
 }
 

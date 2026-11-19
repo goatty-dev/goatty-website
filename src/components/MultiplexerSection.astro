@@ -1,0 +1,567 @@
+---
+import Icon, { type IconName } from "@/components/Icon.astro";
+
+interface MuxPillar {
+  id: "direct" | "identical" | "persistent";
+  icon: IconName;
+  kicker: string;
+  heading: string;
+  body: string;
+}
+
+const pillars: MuxPillar[] = [
+  {
+    id: "direct",
+    icon: "flash",
+    kicker: "No SSH needed",
+    heading: "Fast and predictive on any link",
+    body: "Connect directly over Tailscale without SSH overhead. Local echo makes typing feel instant on shaky Wi-Fi, while flow control skips ahead instead of freezing on heavy output.",
+  },
+  {
+    id: "identical",
+    icon: "split-area",
+    kicker: "Same everywhere",
+    heading: "Your keys and commands keep working",
+    body: "Tabs, splits, desktop copy/paste, and your command palette behave identically on remote machines — no tmux prefixes to memorize and no broken shortcuts.",
+  },
+  {
+    id: "persistent",
+    icon: "cpu",
+    kicker: "Outlives the window",
+    heading: "Close the laptop, keep the work",
+    body: "Sessions live in goattyd, not in your window. Drop Wi-Fi or quit Goatty anytime, then reattach straight back into builds and coding agents with live tab status.",
+  },
+];
+
+const transports = ["Tailscale", "SSH", "docker exec", "kubectl"];
+---
+
+<section id="multiplexer" class="mux-section">
+  <div class="container">
+    <div class="mux-head">
+      <div class="mux-head-main">
+        <p class="mux-kicker pixel-text">Built-in multiplexer</p>
+        <h2>Fast on localhost. Just as fast everywhere else.</h2>
+      </div>
+      <p class="mux-lead">
+        A GPU terminal at its core, backed by one session daemon — local tabs
+        and remote hosts speak the exact same protocol.
+      </p>
+    </div>
+
+    <div class="mux-frame">
+      <div class="mux-grid">
+        {pillars.map((item) => (
+          <article class="mux-col">
+            <div class="mux-stage" aria-hidden="true">
+              {item.id === "direct" && (
+                <div class="vis-direct">
+                  <div class="vis-nodes">
+                    <span class="vis-node vis-node-local">local</span>
+                    <div class="vis-wire">
+                      <span class="vis-pulse" />
+                    </div>
+                    <span class="vis-node vis-node-remote">prod-eu</span>
+                  </div>
+                  <div class="vis-meta">
+                    <span class="vis-chip vis-chip-accent">tailnet</span>
+                    <span class="vis-chip">local echo</span>
+                  </div>
+                </div>
+              )}
+
+              {item.id === "identical" && (
+                <div class="vis-window">
+                  <div class="vis-tabs">
+                    <span class="vis-tab">local</span>
+                    <span class="vis-tab vis-tab-active">
+                      <span class="vis-tab-dot" />
+                      prod-eu
+                    </span>
+                  </div>
+                  <div class="vis-panes">
+                    <div class="vis-pane">
+                      <span class="vis-line vis-line-accent" />
+                      <span class="vis-line vis-line-mid" />
+                      <span class="vis-kbd">Ctrl+C</span>
+                    </div>
+                    <div class="vis-pane">
+                      <span class="vis-line vis-line-short" />
+                      <span class="vis-line vis-line-long" />
+                      <span class="vis-kbd">Ctrl+K</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {item.id === "persistent" && (
+                <div class="vis-daemon">
+                  <div class="vis-session">
+                    <span class="vis-dot vis-dot-live" />
+                    <span class="vis-sname">claude-code</span>
+                    <span class="vis-sstate vis-sstate-live">running</span>
+                  </div>
+                  <div class="vis-session">
+                    <span class="vis-dot vis-dot-ok" />
+                    <span class="vis-sname">cargo-build</span>
+                    <span class="vis-sstate">done</span>
+                  </div>
+                  <div class="vis-session">
+                    <span class="vis-dot vis-dot-idle" />
+                    <span class="vis-sname">api-logs</span>
+                    <span class="vis-sstate">detached</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div class="mux-body">
+              <div class="mux-label-row">
+                <Icon name={item.icon} size={15} class="mux-icon" />
+                <span class="mux-col-kicker pixel-text">{item.kicker}</span>
+              </div>
+              <h3>{item.heading}</h3>
+              <p>{item.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="mux-foot">
+        <div class="mux-transports">
+          <span class="mux-foot-label pixel-text">Transports</span>
+          <div class="mux-pills">
+            {transports.map((t) => <span class="mux-pill">{t}</span>)}
+          </div>
+        </div>
+        <p class="mux-foot-note">
+          Multi-window attach · On-demand scrollback · Clickable remote files
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.mux-section {
+  padding-bottom: clamp(72px, 9vw, 120px);
+}
+
+.mux-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 48px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.mux-head-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mux-kicker {
+  font-size: 0.75rem;
+  color: var(--accent-orange);
+}
+
+.mux-head h2 {
+  font-size: clamp(1.5rem, 2.7vw, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.14;
+  max-width: 24ch;
+  color: var(--ink-primary);
+}
+
+.mux-lead {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  max-width: 40ch;
+}
+
+/* Single unified architectural frame */
+.mux-frame {
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  background-color: var(--bg-surface);
+  overflow: hidden;
+}
+
+.mux-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mux-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mux-col + .mux-col {
+  border-left: 1px solid var(--border-hairline);
+}
+
+/* Minimal dark schematic stage */
+.mux-stage {
+  height: 138px;
+  padding: 18px 22px;
+  background-color: #0a0a0c;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.065) 1px,
+    transparent 1px
+  );
+  background-size: 14px 14px;
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Stage 1: Direct & predictive link */
+.vis-direct {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vis-nodes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vis-node {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 5px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  background-color: #111115;
+  color: var(--ink-secondary);
+  flex-shrink: 0;
+}
+
+.vis-node-remote {
+  border-color: rgba(255, 90, 0, 0.45);
+  color: var(--ink-primary);
+}
+
+.vis-wire {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    #353540 0 4px,
+    transparent 4px 8px
+  );
+  overflow: hidden;
+}
+
+.vis-pulse {
+  position: absolute;
+  top: -2px;
+  left: -18px;
+  width: 18px;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--accent-orange));
+  animation: mux-travel 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes mux-travel {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(170px);
+    opacity: 0;
+  }
+}
+
+.vis-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vis-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--border-hairline);
+  background-color: #0f0f13;
+  color: var(--ink-muted);
+}
+
+.vis-chip-accent {
+  border-color: rgba(255, 90, 0, 0.35);
+  color: var(--accent-orange);
+}
+
+/* Stage 2: Identical splits & shortcuts */
+.vis-window {
+  width: 100%;
+  max-width: 244px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background-color: #0e0e12;
+  overflow: hidden;
+}
+
+.vis-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 5px 6px 0;
+  background-color: #09090b;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.vis-tab {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 3px 8px 4px;
+  color: var(--ink-muted);
+  border-radius: 4px 4px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.vis-tab-active {
+  background-color: #141419;
+  color: var(--ink-primary);
+}
+
+.vis-tab-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background-color: var(--accent-orange);
+}
+
+.vis-panes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vis-pane {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vis-pane + .vis-pane {
+  border-left: 1px solid var(--border-hairline);
+}
+
+.vis-line {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background-color: #25252e;
+}
+
+.vis-line-accent {
+  width: 68%;
+  background-color: rgba(255, 90, 0, 0.55);
+}
+
+.vis-line-mid {
+  width: 85%;
+}
+
+.vis-line-short {
+  width: 54%;
+}
+
+.vis-line-long {
+  width: 90%;
+}
+
+.vis-kbd {
+  margin-top: 4px;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  background-color: #16161c;
+  color: var(--ink-secondary);
+}
+
+/* Stage 3: Always-on goattyd sessions */
+.vis-daemon {
+  width: 100%;
+  max-width: 248px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vis-session {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-hairline);
+  background-color: #0e0e12;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.vis-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.vis-dot-live {
+  background-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.18);
+}
+
+.vis-dot-ok {
+  background-color: #34c77b;
+}
+
+.vis-dot-idle {
+  background-color: #4f4f5c;
+}
+
+.vis-sname {
+  color: var(--ink-primary);
+}
+
+.vis-sstate {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+}
+
+.vis-sstate-live {
+  color: var(--accent-orange);
+}
+
+/* Column copy */
+.mux-body {
+  padding: 24px 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mux-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mux-icon {
+  color: var(--accent-orange);
+}
+
+.mux-col-kicker {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+.mux-body h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  color: var(--ink-primary);
+}
+
+.mux-body p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+/* Integrated footer bar */
+.mux-foot {
+  border-top: 1px solid var(--border-hairline);
+  background-color: #0b0b0e;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.mux-transports {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mux-foot-label {
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+}
+
+.mux-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mux-pill {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-secondary);
+  background-color: #131318;
+  border: 1px solid var(--border-hairline);
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+.mux-foot-note {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 900px) {
+  .mux-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mux-col + .mux-col {
+    border-left: none;
+    border-top: 1px solid var(--border-hairline);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vis-pulse {
+    animation: none;
+    left: calc(50% - 9px);
+    opacity: 1;
+  }
+}
+</style>

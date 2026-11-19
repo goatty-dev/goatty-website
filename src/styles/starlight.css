@@ -55,6 +55,7 @@
     /* Balanced doc proportions */
     --sl-nav-height: 4rem;
     --sl-sidebar-width: 17.25rem;
+    --sl-toc-width: 16rem;
     --sl-content-width: 46rem;
   }
 
@@ -130,9 +131,47 @@
     border-radius: 8px;
   }
 
-  /* Right Table of Contents */
+  /* Right Table of Contents & Balanced Two-Column Layout */
   .right-sidebar {
     border-inline-start: 1px solid #202026;
+  }
+
+  @media (min-width: 72rem) {
+    .right-sidebar-container {
+      flex: 0 0 var(--sl-toc-width);
+      width: var(--sl-toc-width);
+      margin-inline-start: 0;
+    }
+
+    .right-sidebar {
+      width: var(--sl-toc-width);
+    }
+
+    .right-sidebar-panel .sl-container {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .main-pane,
+    [data-has-sidebar][data-has-toc] .main-pane {
+      --sl-content-margin-inline: auto;
+      flex: 1 1 0%;
+      min-width: 0;
+      width: auto;
+    }
+
+    [data-has-sidebar][data-has-toc] header.header > .header {
+      --__main-column-fr: calc(
+        (
+          100% +
+          var(--__sidebar-pad, 0rem) -
+          var(--sl-toc-width) -
+          var(--sl-content-inline-start, 0rem) -
+          var(--sl-content-width)
+        ) /
+        2
+      );
+    }
   }
 
   starlight-toc h2 {
