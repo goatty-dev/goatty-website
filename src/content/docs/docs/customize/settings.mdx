@@ -1,0 +1,88 @@
+---
+title: Settings & profiles
+description: Change everything visually, preview shell changes before they apply, and roll back if you don't like them.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+Open Settings with <kbd>Ctrl</kbd>+<kbd>,</kbd>. Use **Search settings** at the top to find any setting by its name or by what it does.
+
+## The pages
+
+| Page | What it controls |
+| --- | --- |
+| **Appearance** | Themes (one, or light and dark following your desktop), fonts, size, cursor, padding, background opacity and blur. |
+| **Terminal** | Links, selection and copy behavior, right-click action. |
+| **Workspace** | New window layout, tab style, program icons, notifications. |
+| **Shortcuts** | Every action and its keys. Search, record a new keystroke, reset. |
+| **Hosts** and **Network** | [SSH and Tailscale hosts](/docs/using/remote-hosts). |
+| **Shell**, **Dotfiles**, **PATH** | [Managed Zsh](/docs/using/managed-zsh), what's imported from your setup, PATH folders. |
+| **Prompt** and **History** | The Starship prompt and shell history. |
+| **Aliases** | Your aliases, and the ones plugins add. |
+| **Snippets** | [Snippets & expansions](/docs/using/snippets). |
+| **Plugins** | [Browse, install and configure plugins](/docs/customize/plugins). |
+| **Diagnostics** | A health report for the shell on the current host. |
+| **Profile** | Problems, file locations, export and import, version history. |
+
+## Two kinds of settings
+
+goatty keeps two settings files in `~/.config/goatty/`:
+
+- `settings.json` is for **this computer's window**: fonts, theme, shortcuts, tabs. It lives where the window runs.
+- `host.json` is for **the shell on each host**: prompt, aliases, history, plugins. Every machine running `goattyd` has its own.
+
+When you connect to another host, the shell pages show *that* host's settings. Files stay readable JSON, and only values that differ from the defaults are written, so improved defaults reach you automatically.
+
+## Preview, then apply
+
+Window settings (theme, fonts, cursor) change live. **Shell** settings are collected in a draft first:
+
+<Steps>
+1. Change settings on any shell page.
+
+   Pages with unapplied changes are marked in the sidebar.
+
+2. Choose **Preview**.
+
+   goatty shows a colored diff of the files it would generate.
+
+3. Choose **Apply**, or **Discard**.
+
+   Apply validates the new configuration first. If it's invalid, nothing changes.
+
+4. Choose **Reload running shells** when offered.
+
+   Existing shells pick up the change at their next idle prompt.
+</Steps>
+
+## Roll back
+
+Every applied change is a **generation**. Under **Settings → Profile** you can see what each one changed, name them (for example "before trying fish"), and roll back to any of the last 10. From a terminal:
+
+```bash
+goattyd shell generations     # list them
+goattyd shell diff 8          # what changed in generation 8
+goattyd shell rollback        # go back to the previous one
+```
+
+## Profiles: export and import
+
+**Profile → Export** writes your settings as one file, with only non-default values and without machine-specific ones. **Import** applies the window settings right away and stages the shell part as a draft for you to preview and apply. This is a quick way to set up a new computer.
+
+## From the command line
+
+Everything also works without a window, which is useful for scripts, SSH sessions and dotfile repos:
+
+```bash
+goatty settings show font          # what's stored for a key
+goatty settings set font.size 15   # change a value
+goatty settings validate           # exit code 1 on problems
+goatty theme list                  # themes
+goatty settings export profile.json
+```
+
+<Aside type="tip" title="Mistakes are forgiven">
+  If a value in a settings file is invalid, goatty reverts just that value to its default and tells you about it on the Profile page. The rest of your settings are kept, and the file is left untouched.
+</Aside>
+
+The full details of the settings model are in the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/profiles.md).

@@ -96,6 +96,45 @@ export default defineConfig({
             },
           ],
         },
+        {
+          label: "Using goatty",
+          items: [
+            { label: "Managed Zsh", slug: "docs/using/managed-zsh" },
+            { label: "Snippets & expansions", slug: "docs/using/snippets" },
+            { label: "Coding agents", slug: "docs/using/coding-agents" },
+            {
+              label: "Remote hosts & sessions",
+              slug: "docs/using/remote-hosts",
+            },
+          ],
+        },
+        {
+          label: "Customize",
+          items: [
+            { label: "Settings & profiles", slug: "docs/customize/settings" },
+            { label: "Plugins", slug: "docs/customize/plugins" },
+          ],
+        },
+        {
+          label: "Go deeper",
+          items: [
+            {
+              label: "Technical docs",
+              link: "https://github.com/goatty-dev/goatty/tree/main/docs",
+              attrs: { target: "_blank", rel: "noopener" },
+            },
+            {
+              label: "Plugin template",
+              link: "https://github.com/goatty-dev/goatty-plugin-template",
+              attrs: { target: "_blank", rel: "noopener" },
+            },
+            {
+              label: "Plugin registry",
+              link: "https://github.com/goatty-dev/goatty-registry",
+              attrs: { target: "_blank", rel: "noopener" },
+            },
+          ],
+        },
       ],
     }),
     sitemap(),

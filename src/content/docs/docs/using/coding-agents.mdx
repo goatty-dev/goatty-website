@@ -1,0 +1,56 @@
+---
+title: Coding agents
+description: See at a glance which agent runs in each tab, what it's doing, and get told when it needs you or finishes.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+goatty notices when a coding agent runs in a tab. It shows which agent it is, whether it's working, and tells you when it needs you (a permission, a question) or is done. This works without any setup for agents that report their state.
+
+## Supported agents
+
+| Agent | State reporting |
+| --- | --- |
+| Claude Code | Yes, no setup |
+| Codex CLI | Yes, no setup |
+| OpenCode | Yes, no setup |
+| Antigravity | Yes, no setup |
+| Goose, GitHub Copilot CLI | Logo only, taken from the process name |
+
+Agents that don't report their state still get their logo, and goatty still passes on desktop notifications if they send them (some need that enabled in their own settings).
+
+<Aside type="note">
+  Agents tell goatty what they're doing with a small terminal protocol (`OSC 7501`). Because it travels through the terminal stream, it also works over SSH and inside a persistent `goattyd` session.
+</Aside>
+
+## What you see
+
+- **Tab icon:** the agent's logo.
+- **Tab mark:** a spinner while it works, a pulsing badge when it's blocked and waiting for you (with an icon for permission, question or login), and a check or cross when it's done or has failed. A done or failed mark stays until you've looked at the tab.
+- **Background tabs:** a tab waiting for you is tinted in the warning color, so you can spot it in a long tab list.
+- **Vertical tabs:** a second line says what the agent is doing, for example "Waiting for permission · Bash: cargo test".
+- **Progress:** a thin line along the bottom of the tab shows the agent's progress.
+- **Split panes:** the pane that waits for you gets a highlighted ring and a label naming what it waits for.
+
+## Notifications
+
+goatty tells you in two places: inside the app (a toast) and on the desktop. Under **Settings → Workspace → Notifications** you choose for each one when it shows:
+
+| Option | Meaning |
+| --- | --- |
+| Never | Don't notify. |
+| When not looking | The pane isn't on screen: another tab is open, or goatty isn't focused. |
+| When unfocused | Only when the goatty window isn't focused. |
+| Always | Every time. |
+
+You can also pick which events notify you: an agent **waiting for you**, an agent **done**, and **other programs**.
+
+- You get one notification per pane. A "waiting" toast stays until you deal with it or the agent moves on.
+- Clicking a desktop notification brings you to that window, tab and pane.
+- Repeated identical reports and reattaching to a session stay quiet, so you aren't notified twice about the same thing.
+
+## Keep agents running
+
+Run an agent inside a `goattyd` session and it keeps going when you close the window. Reopen goatty and the tab, its state and its notifications are all still there. See [Remote hosts & sessions](/docs/using/remote-hosts).
+
+For the protocol details and how each agent was checked, see the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/coding-agents.md).

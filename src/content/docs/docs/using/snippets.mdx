@@ -1,0 +1,65 @@
+---
+title: Snippets & expansions
+description: Find the command you can't remember, fill in the blanks one at a time, and read it before it runs.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+Snippets and expansions are goatty's helpers for commands you don't know by heart yet. **Nothing runs until you press Enter yourself.**
+
+## Snippets
+
+A snippet is a command with blanks. You search for what you want to do, goatty asks for the missing values, and the finished command lands on your prompt.
+
+<Steps>
+1. Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>.
+
+   You can also open the command palette and choose **Snippets: Find and fill in a command**.
+
+2. Search for what you want to do.
+
+   Try "find big files", "extract" or "stop a program". Search covers titles, descriptions, tags and the command itself. Topic chips narrow the list (<kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> step through them). Recently used snippets come first.
+
+3. Press <kbd>Enter</kbd> and fill in the blanks.
+
+   goatty asks one question per blank and shows the finished command above the field as you type. Where it can, it suggests values: your running programs, or the branches of the current repository. Press <kbd>Tab</kbd> to take a suggestion and <kbd>Esc</kbd> to go back.
+
+4. Read the command, then run it.
+
+   The last <kbd>Enter</kbd> puts the command on the prompt of the focused pane, at the cursor. It goes through the normal paste check, so a command like `curl … | sh` still asks first.
+</Steps>
+
+Each snippet has a **safety badge**: `safe`, `changes` or `destructive`. Snippets for programs that aren't installed on the host are listed last and dimmed ("Needs docker").
+
+### Your own snippets
+
+- **Save the last command.** From the palette, choose **Snippets: Save the last command as a snippet…**. goatty opens the editor with your last command. Put `{name}` where a value should change, and it becomes a blank.
+- **Settings → Snippets** lets you add, edit, switch off or delete your own, and copy a built-in one to change it ("Make my own copy").
+- **Command line:** `goattyd snippet list | show | add | rm | export | import`. Export and import use the same format plugins use, so a collection moves between machines unchanged.
+
+<Aside type="tip">
+  Your snippets are part of your host settings, so they travel with the rest of your shell setup when goatty [syncs it to another host](/docs/using/remote-hosts).
+</Aside>
+
+## Expansions
+
+Expansions rewrite plain words into a command while you type. With the built-in **Basics** pack on:
+
+```text
+| first 20 lines␣      →   | head -n 20
+```
+
+- Press <kbd>Space</kbd> after the words and they turn into the command.
+- If the line ends in an expansion, <kbd>Enter</kbd> expands it and **stops**, so you see the command before it runs. Press <kbd>Enter</kbd> again to run it.
+- <kbd>Backspace</kbd> straight after an expansion undoes it and brings back what you typed.
+- Nothing is expanded inside quotes or after a paste.
+
+You can turn expansions off with the `shell.expansions` switch on **Settings → Snippets**, where there's also a **Try it** field to test rules.
+
+## What's built in
+
+goatty ships the **Basics** pack: about 35 everyday snippets and a dozen expansions, on by default. Plugins from the [registry](/docs/customize/plugins) can add more. You can turn Basics off like any other built-in plugin.
+
+## Going further
+
+The format for writing snippets and expansions by hand, and how suggestion sources work, is described in the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/snippets.md).

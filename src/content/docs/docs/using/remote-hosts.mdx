@@ -1,0 +1,66 @@
+---
+title: Remote hosts & sessions
+description: Open other machines over SSH or Tailscale and get the same managed shell there.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+goatty can open tabs on other computers, and bring your shell setup with it, so your prompt, aliases and tools feel the same everywhere.
+
+## The idea
+
+Each machine runs `goattyd`, a small daemon that owns the shell sessions. The goatty window is a client. This gives you:
+
+- **Persistent sessions.** Programs (including [coding agents](/docs/using/coding-agents)) keep running when you close the window.
+- **One shell everywhere.** goatty can copy your managed shell setup to a host.
+- **Two ways in:** SSH, or Tailscale pairing.
+
+## Connect over SSH
+
+Open **Settings → Hosts**. You can:
+
+- add a host as `user@host`, or the name of an alias from your `~/.ssh/config`, with an optional display name;
+- pick from the hosts already listed in your `~/.ssh/config`;
+- choose whether hosts open in a new window or a new tab.
+
+## Connect over Tailscale
+
+If both computers are on your tailnet, you can pair them without SSH. goatty uses the Tailscale you've already installed and logged in to. It never installs it, logs in, or runs `sudo`.
+
+<Steps>
+1. On the computer you want to reach: **Settings → Network → Make this computer available**.
+
+2. On the same computer, choose **Allow a new device**.
+
+   This opens a pairing window for 5 minutes.
+
+3. On your other computer, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>.
+
+   goatty lists the computers on your tailnet that answer on its port.
+
+4. Pick the computer and choose **Pair**.
+
+   Compare the 6-digit code shown on both screens and confirm on both.
+</Steps>
+
+From then on it appears as a host like any other, under its Tailscale name. **Settings → Network** shows Tailscale's state, the paired devices (you can revoke them), and the hosts this computer paired with.
+
+<Aside type="note">
+  `goattyd` doesn't open a network port of its own. Tailscale access goes through `tailscale serve`.
+</Aside>
+
+## Sync your shell setup
+
+When a tab connects to a host whose setup differs from yours, goatty asks whether to bring yours over: **Sync**, **Always sync this host**, or **Not now**. Syncing copies:
+
+1. the plugins you've installed (at the same version, never downgrading a newer one),
+2. goatty's built-in tools,
+3. your host settings: prompt, aliases, history, snippets and every plugin's settings.
+
+Plugins are installed on the other host without a second review only when its plan is exactly the one you approved here, from a registry both computers trust.
+
+## Weak connections
+
+goatty can show what you type before the host echoes it back (a setting on **Settings → Hosts**: auto, always or never), which helps on slow links.
+
+For the design behind all this, see the technical docs on GitHub: [tailnet](https://github.com/goatty-dev/goatty/blob/main/docs/tailnet.md) and [remote architecture](https://github.com/goatty-dev/goatty/blob/main/docs/remote-architecture.md).

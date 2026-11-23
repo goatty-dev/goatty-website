@@ -1,0 +1,76 @@
+---
+title: Managed Zsh
+description: The shell goatty sets up for you — autosuggestions, syntax highlighting, fzf, and a Starship prompt — without touching your dotfiles.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+Every goatty tab starts a Zsh session with a configuration goatty generates. You get a good shell on the first command, and your own `~/.zshrc`, `~/.zshenv` and friends are never edited.
+
+## What you get
+
+| Tool | What it does |
+| --- | --- |
+| **Autosuggestions** | Ghost-text suggestions from your history and completions as you type. |
+| **Syntax highlighting** | Valid commands turn green, typos turn red, before you press Enter. |
+| **fzf** | Fuzzy search for history (<kbd>Ctrl</kbd>+<kbd>R</kbd>) and files. |
+| **fzf-tab** | Tab completion shown as a searchable list, with previews. |
+| **Starship** | A fast prompt with git, language and duration info. |
+| **Snippets & expansions** | Plain-English command helpers. See [Snippets & expansions](/docs/using/snippets). |
+
+These tools are goatty plugins that ship with it. Each one can be turned off on its own under **Settings → Plugins**.
+
+<Aside type="tip" title="Not a Zsh user yet?">
+  goatty is built so that you don't need to know Zsh configuration. Everything on this page can be changed with clicks in [Settings](/docs/customize/settings).
+</Aside>
+
+## Your existing setup
+
+goatty keeps your setup working without taking it over.
+
+- **PATH and variables are imported.** Tools set up by installers (rustup, nvm, bun, pnpm, Homebrew, conda) usually add folders and variables to `~/.zshrc` or `~/.bashrc`. goatty reads those once, caches the result, and applies the PATH folders and exported variables in its own shell, so `cargo` or `node` work in your first tab. Find this under **Settings → Dotfiles**.
+- **Aliases are copied once.** The Aliases page offers "Your aliases from ~/.zshrc". After you add them they belong to goatty, and your file stays as it is.
+- **`~/.zshrc` is off by default.** Most `.zshrc` files load their own prompt and plugins, which would clash with goatty's. You can turn it on under **Settings → Dotfiles**. It then runs in a guarded mode, before goatty's plugins, so goatty's prompt still wins.
+- **`~/.zshenv` and `~/.zprofile` run as normal.**
+
+<Aside type="note" title="What isn't imported">
+  Shell *functions* and hooks (`nvm`, `conda activate`, direnv, zoxide hooks) are not imported, although the PATH changes they make are. To keep those, turn on the guarded `.zshrc` or look for a matching tool in the [plugin registry](/docs/customize/plugins), for example zoxide.
+</Aside>
+
+## The prompt
+
+**Settings → Prompt** has a live preview. You can choose a style (`rich`, `lean`, `classic`, `rainbow`), symbol set (Nerd Font, emoji, text or none), one or two lines, and how long a command must run before its duration shows. If you already have a `starship.toml` and want to keep it, turn on "use my own starship.toml", or turn the Starship plugin off to keep any other prompt.
+
+## History
+
+**Settings → History** controls the history size (100,000 by default), duplicate handling, whether commands starting with a space are skipped, and whether history is shared between sessions.
+
+## Adding folders to PATH
+
+**Settings → PATH** lets you add, browse for, reorder and remove folders. It also shows the PATH a new shell actually gets, and where each folder came from.
+
+## Checking that everything works
+
+<Steps>
+1. Open **Settings → Diagnostics**.
+
+   It lists every feature, whether it comes from your system or from goatty's own managed copy, how long startup took, and anything the startup printed to stderr.
+
+2. Install anything that's missing.
+
+   The page has an **Install** button for missing tools and an **Update** button when goatty ships a newer pinned version.
+
+3. Copy the report if you need help.
+
+   **Copy report** puts the whole thing on your clipboard, ready for a bug report.
+</Steps>
+
+From inside a shell, `goatty-status` prints the same feature table, and `goatty-reload` restarts the current shell with the latest goatty configuration.
+
+## Using plain Zsh instead
+
+Turn off **Managed zsh** under **Settings → Shell** and goatty starts your shell with no generated configuration at all.
+
+<Aside type="caution">
+  The deep details — startup file order, generated files and design decisions — live in the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/managed-zsh.md). You don't need them to use goatty.
+</Aside>
