@@ -6,7 +6,6 @@
   xmlns="http://www.w3.org/2000/svg"
 >
   <title>goatty</title>
-  <rect width="256" height="256" rx="56" fill="#080809" />
   <path
     d="M88 83C66 80 53 65 58 49C62 35 79 31 88 41C92 45 91 51 87 55"
     stroke="#ff5a00"

@@ -1,0 +1,478 @@
+---
+/**
+ * Replaces the old settings-window mockup.
+ * Real controls on the left, and on the right the shell lines they stand in
+ * for, rewritten live as you change a setting. The point it makes: you pick
+ * options in plain words, goatty takes care of the config.
+ */
+import { defaults, tools } from "@/scripts/pluginDemo";
+---
+
+<section id="plugins" class="plugins" data-plugin-demo>
+  <div class="container">
+    <header class="pl-head">
+      <h2>Settings in plain words. No config to write.</h2>
+      <p>
+        Every option has a place in Settings, explained in a sentence. Plugins
+        add tools like eza, bat and zoxide in one click, show you every download
+        and permission before installing, and never need root.
+      </p>
+    </header>
+
+    <div class="pl-tabs" role="tablist" aria-label="Plugin">
+      {tools.map((tool, i) => (
+        <button
+          type="button"
+          role="tab"
+          class="pl-tab"
+          id={`pl-tab-${tool.id}`}
+          aria-controls={`pl-panel-${tool.id}`}
+          aria-selected={i === 0 ? "true" : "false"}
+          tabindex={i === 0 ? 0 : -1}
+          data-pl-tab={tool.id}
+        >
+          {tool.name}
+        </button>
+      ))}
+    </div>
+
+    {tools.map((tool, i) => (
+      <div
+        class="pl-panel"
+        id={`pl-panel-${tool.id}`}
+        role="tabpanel"
+        aria-labelledby={`pl-tab-${tool.id}`}
+        data-pl-panel={tool.id}
+        hidden={i !== 0}
+      >
+        <div class="pl-controls">
+          <p class="pl-summary">{tool.summary}</p>
+          {tool.controls.map((ctrl) => (
+            <div class="pl-row">
+              <span class="pl-label" id={`pl-${tool.id}-${ctrl.id}`}>
+                {ctrl.label}
+              </span>
+              {ctrl.kind === "switch" ? (
+                <button
+                  type="button"
+                  role="switch"
+                  class="pl-switch"
+                  aria-checked={ctrl.value ? "true" : "false"}
+                  aria-labelledby={`pl-${tool.id}-${ctrl.id}`}
+                  data-control={ctrl.id}
+                >
+                  <span class="pl-thumb" />
+                </button>
+              ) : (
+                <fieldset
+                  class="pl-choice"
+                  aria-labelledby={`pl-${tool.id}-${ctrl.id}`}
+                  data-control={ctrl.id}
+                >
+                  {ctrl.options.map((opt) => (
+                    <button
+                      type="button"
+                      class="pl-option"
+                      aria-pressed={opt === ctrl.value ? "true" : "false"}
+                      data-option={opt}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </fieldset>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div class="pl-output">
+          <p class="pl-output-title">
+            What you would otherwise keep in <code>~/.zshrc</code>
+          </p>
+          <div class="pl-code" aria-live="polite" data-pl-code>
+            {tool.lines(defaults(tool)).map((line) => (
+              <span class="pl-line">{line}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))}
+
+    <p class="pl-foot">
+      When you connect to another machine, goatty brings your plugins and their
+      settings along.
+      <a href="/docs/customize/plugins">How plugins work</a>
+    </p>
+  </div>
+</section>
+
+<script>
+import { defaults, tools, type Values } from "@/scripts/pluginDemo";
+
+function initPluginDemo(root: HTMLElement): void {
+  const tabs = Array.from(
+    root.querySelectorAll<HTMLButtonElement>("[data-pl-tab]"),
+  );
+  const panels = root.querySelectorAll<HTMLElement>("[data-pl-panel]");
+
+  const selectTab = (tab: HTMLButtonElement) => {
+    for (const other of tabs) {
+      const active = other === tab;
+      other.setAttribute("aria-selected", String(active));
+      other.tabIndex = active ? 0 : -1;
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.plPanel !== tab.dataset.plTab;
+    }
+  };
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      const step =
+        event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      const next = tabs[(i + step + tabs.length) % tabs.length];
+      selectTab(next);
+      next.focus();
+    });
+  });
+
+  for (const panel of panels) {
+    const tool = tools.find((t) => t.id === panel.dataset.plPanel);
+    const code = panel.querySelector<HTMLElement>("[data-pl-code]");
+    if (!tool || !code) continue;
+
+    const values: Values = defaults(tool);
+
+    const render = () => {
+      const before = new Set(
+        Array.from(code.children, (el) => el.textContent ?? ""),
+      );
+      code.replaceChildren(
+        ...tool.lines(values).map((line) => {
+          const span = document.createElement("span");
+          span.className = before.has(line) ? "pl-line" : "pl-line is-changed";
+          span.textContent = line;
+          return span;
+        }),
+      );
+    };
+
+    for (const sw of panel.querySelectorAll<HTMLButtonElement>(
+      "button[role=switch]",
+    )) {
+      sw.addEventListener("click", () => {
+        const next = sw.getAttribute("aria-checked") !== "true";
+        sw.setAttribute("aria-checked", String(next));
+        values[sw.dataset.control ?? ""] = next;
+        render();
+      });
+    }
+
+    for (const group of panel.querySelectorAll<HTMLElement>(
+      "fieldset[data-control]",
+    )) {
+      const options = group.querySelectorAll<HTMLButtonElement>(".pl-option");
+      for (const opt of options) {
+        opt.addEventListener("click", () => {
+          for (const other of options) {
+            other.setAttribute("aria-pressed", String(other === opt));
+          }
+          values[group.dataset.control ?? ""] = opt.dataset.option ?? "";
+          render();
+        });
+      }
+    }
+  }
+}
+
+for (const root of document.querySelectorAll<HTMLElement>(
+  "[data-plugin-demo]",
+)) {
+  initPluginDemo(root);
+}
+</script>
+
+<style>
+.plugins {
+  padding-block: clamp(56px, 7vw, 100px);
+}
+
+.pl-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px 64px;
+  align-items: end;
+  margin-bottom: clamp(40px, 5vw, 60px);
+}
+
+.pl-head h2 {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  max-width: 15ch;
+}
+
+.pl-head p {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  max-width: 46ch;
+}
+
+/* Tabs: same underline vocabulary as the install picker */
+.pl-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.pl-tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.pl-tab:hover {
+  color: var(--ink-primary);
+}
+
+.pl-tab[aria-selected="true"] {
+  color: var(--ink-primary);
+  border-bottom-color: var(--accent-orange);
+}
+
+.pl-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px 64px;
+  padding-top: 32px;
+}
+
+.pl-panel[hidden] {
+  display: none;
+}
+
+.pl-summary {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+
+.pl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  min-height: 60px;
+  padding-block: 10px;
+}
+
+.pl-row + .pl-row {
+  border-top: 1px solid var(--border-hairline);
+}
+
+.pl-label {
+  font-size: 0.9875rem;
+  font-weight: 500;
+  color: var(--ink-primary);
+}
+
+/* Switch */
+.pl-switch {
+  appearance: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background-color: var(--bg-surface-hover);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.pl-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: var(--ink-muted);
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms ease;
+}
+
+.pl-switch[aria-checked="true"] {
+  background-color: var(--accent-orange);
+  border-color: var(--accent-orange);
+}
+
+.pl-switch[aria-checked="true"] .pl-thumb {
+  transform: translateX(18px);
+  background-color: var(--ink-on-accent);
+}
+
+/* Choice: a pill of options */
+.pl-choice {
+  display: inline-flex;
+  margin: 0;
+  min-width: 0;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-surface);
+}
+
+.pl-option {
+  appearance: none;
+  height: 30px;
+  padding-inline: 13px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.pl-option:hover {
+  color: var(--ink-primary);
+}
+
+.pl-option[aria-pressed="true"] {
+  background-color: #24242c;
+  color: var(--ink-primary);
+}
+
+/* Output */
+.pl-output {
+  min-width: 0;
+  padding-left: 28px;
+  border-left: 1px solid var(--border-hairline);
+}
+
+.pl-output-title {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin-bottom: 18px;
+}
+
+.pl-output-title code {
+  font-family: var(--font-mono);
+  color: var(--ink-secondary);
+}
+
+.pl-code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+}
+
+.pl-code :global(.pl-line) {
+  display: block;
+  white-space: pre-wrap;
+  /* Wrapped config lines hang under their first word, like an editor */
+  padding-left: calc(2ch + 6px);
+  text-indent: -2ch;
+  width: fit-content;
+  max-width: 100%;
+  padding-right: 6px;
+  margin-inline: -6px;
+  border-radius: 4px;
+}
+
+.pl-code :global(.pl-line.is-changed) {
+  animation: line-changed 1.4s ease-out;
+}
+
+@keyframes line-changed {
+  0% {
+    color: var(--accent-orange);
+    background-color: rgba(255, 90, 0, 0.12);
+  }
+  100% {
+    color: var(--ink-secondary);
+    background-color: transparent;
+  }
+}
+
+.pl-foot {
+  margin-top: 40px;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+
+.pl-foot a {
+  margin-left: 6px;
+  color: var(--ink-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-orange);
+  text-underline-offset: 4px;
+}
+
+.pl-foot a:hover {
+  color: var(--accent-orange);
+}
+
+@media (max-width: 900px) {
+  .pl-head,
+  .pl-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pl-output {
+    padding-left: 0;
+    padding-top: 24px;
+    border-left: none;
+    border-top: 1px solid var(--border-hairline);
+  }
+}
+
+@media (max-width: 480px) {
+  .pl-row:has(.pl-choice) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-tab,
+  .pl-switch,
+  .pl-thumb,
+  .pl-option {
+    transition: none;
+  }
+
+  .pl-code :global(.pl-line.is-changed) {
+    animation: none;
+    color: var(--accent-orange);
+  }
+}
+</style>

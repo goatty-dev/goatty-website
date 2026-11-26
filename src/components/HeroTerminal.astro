@@ -1,0 +1,405 @@
+---
+import Icon from "@/components/Icon.astro";
+import { finalState, renderScreen } from "@/scripts/heroTerminal";
+
+const final = finalState();
+---
+
+<div class="term-stage">
+  <canvas class="term-glow" data-dither-glow aria-hidden="true"></canvas>
+
+  <figure class="term" data-term data-agent={final.agent}>
+    <figcaption class="sr-only">
+      A goatty window with a Starship prompt drawn in JetBrains Mono Nerd Font.
+      A typo in a command shows in red, then a suggestion from history completes
+      a cargo test command, and the plain-English phrase “first 20 lines”
+      expands to head -n 20. Meanwhile a Claude Code session in another tab asks
+      for permission.
+    </figcaption>
+
+    <div class="term-bar" aria-hidden="true">
+      <div class="term-tabs">
+        <span class="term-tab is-active">
+          <Icon name="terminal" size={14} />
+          api
+        </span>
+        <span class="term-tab term-tab-agent">
+          <span class="agent-mark"></span>
+          claude
+        </span>
+        <span class="term-tab">
+          <Icon name="server-connection" size={14} />
+          prod-eu
+        </span>
+      </div>
+      <span class="term-plus">+</span>
+    </div>
+
+    <div class="term-body" aria-hidden="true">
+      <div
+        class="term-screen"
+        data-term-screen
+        set:html={renderScreen(final)}
+      />
+
+      <div class="term-toast">
+        <span class="toast-mark"></span>
+        <span class="toast-copy">
+          <strong>claude is waiting for permission</strong>
+          <span>Bash: cargo test --workspace</span>
+        </span>
+      </div>
+    </div>
+  </figure>
+</div>
+
+<script>
+import { initDitherGlow } from "@/scripts/ditherGlow";
+import {
+  initialState,
+  renderScreen,
+  steps,
+  type TermState,
+} from "@/scripts/heroTerminal";
+
+initDitherGlow();
+
+const reducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)",
+).matches;
+
+const term = document.querySelector<HTMLElement>("[data-term]");
+const screen = term?.querySelector<HTMLElement>("[data-term-screen]");
+
+/** How long the finished session stays up before it clears and replays. */
+const HOLD_MS = 4000;
+/** The blank prompt between loops, long enough for the toast to fade out. */
+const CLEAR_MS = 700;
+
+if (term && screen && !reducedMotion) {
+  const paint = (state: TermState) => {
+    screen.innerHTML = renderScreen(state);
+    term.dataset.agent = state.agent;
+  };
+  const wait = (ms: number) =>
+    new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+  // A new loop only starts while someone can see it: scrolled past or in a
+  // background tab, the demo rests on its finished frame until it is back.
+  let inView = true;
+  let wake: (() => void) | null = null;
+  const canPlay = () => inView && !document.hidden;
+  const whenVisible = () =>
+    canPlay()
+      ? Promise.resolve()
+      : new Promise<void>((resolve) => {
+          wake = () => {
+            if (!canPlay()) return;
+            wake = null;
+            resolve();
+          };
+        });
+
+  new IntersectionObserver((entries) => {
+    inView = entries[0]?.isIntersecting ?? true;
+    wake?.();
+  }).observe(term);
+  document.addEventListener("visibilitychange", () => wake?.());
+
+  // The server-rendered last frame stays hidden until the first replay starts.
+  const loop = async () => {
+    for (;;) {
+      await whenVisible();
+      const state = initialState();
+      term.classList.add("is-playing");
+      term.classList.remove("is-done");
+      paint(state);
+      for (const ms of steps(state)) {
+        paint(state);
+        if (ms > 0) await wait(ms);
+      }
+      term.classList.add("is-done");
+      term.classList.remove("is-playing");
+
+      await wait(HOLD_MS);
+      paint(initialState());
+      await wait(CLEAR_MS);
+    }
+  };
+  void loop();
+}
+</script>
+
+<style>
+.term-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+.term-glow {
+  position: absolute;
+  z-index: -1;
+  left: -12%;
+  right: -12%;
+  top: 18%;
+  bottom: -26%;
+  width: 124%;
+  height: 108%;
+  opacity: 0.42;
+  image-rendering: pixelated;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, #000 30%);
+}
+
+.term {
+  margin: 0;
+  border-radius: var(--radius-surface);
+  border: 1px solid var(--border-strong);
+  background-color: #0b0b0d;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 40px 80px -30px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+/*
+ * With JS and motion allowed, the server-rendered last frame would flash
+ * before the replay starts, so the screen stays blank until it does.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(html.js) .term:not(.is-playing, .is-done) .term-body {
+    visibility: hidden;
+  }
+
+  :global(html.js) .term:not(.is-playing, .is-done) .agent-mark {
+    animation: none;
+    background: none;
+  }
+}
+
+/* Tabs */
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 0;
+  background-color: #08080a;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.term-tabs {
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.term-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding-inline: 14px 18px;
+  border-radius: 8px 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+.term-tab.is-active {
+  background-color: #0b0b0d;
+  color: var(--ink-primary);
+  box-shadow:
+    1px 0 0 var(--border-hairline),
+    -1px 0 0 var(--border-hairline),
+    0 1px 0 #0b0b0d;
+  position: relative;
+  top: 1px;
+}
+
+.term-plus {
+  padding-inline: 10px;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
+
+/* Agent tab: spinner while working, a steady dot once it waits for you */
+.agent-mark {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  border-top-color: var(--ink-secondary);
+  animation: agent-spin 0.9s linear infinite;
+}
+
+[data-agent="waiting"] .term-tab-agent {
+  background-color: rgba(255, 90, 0, 0.12);
+  color: var(--ink-primary);
+}
+
+[data-agent="waiting"] .agent-mark {
+  border: none;
+  background-color: var(--accent-orange);
+  animation: none;
+}
+
+@keyframes agent-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Screen */
+.term-body {
+  position: relative;
+}
+
+.term-screen {
+  height: 23.5rem;
+  padding: 18px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  font-family: var(--font-term);
+  font-size: 0.875rem;
+  line-height: 1.68;
+  color: var(--ink-secondary);
+}
+
+.term-screen :global(.t-line) {
+  white-space: pre;
+  min-height: 1.68em;
+}
+
+.term-screen :global(.t-cursor) {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  margin-bottom: -0.2em;
+  background-color: var(--ink-primary);
+  animation: cursor-blink 1.1s steps(1) infinite;
+}
+
+.term-screen :global(.t-ghost) {
+  margin-left: -0.6em;
+}
+
+.term.is-playing .term-screen :global(.t-cursor) {
+  animation: none;
+}
+
+.term-screen :global(.t-key) {
+  margin-left: 12px;
+  height: 20px;
+  vertical-align: 1px;
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.term-screen :global(.t-hint) {
+  margin-left: 16px;
+  color: var(--term-yellow);
+  opacity: 0.75;
+  font-size: 0.8em;
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Notification toast, shown once the agent asks for permission */
+.term-toast {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 18px 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background-color: rgba(20, 20, 24, 0.94);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-agent="waiting"] .term-toast {
+  opacity: 1;
+  transform: none;
+}
+
+.toast-mark {
+  margin-top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: var(--accent-orange);
+  flex-shrink: 0;
+}
+
+.toast-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.toast-copy strong {
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.toast-copy span {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 720px) {
+  .term-screen {
+    height: 19rem;
+    padding: 14px 16px 18px;
+    font-size: 0.75rem;
+  }
+
+  .term-tab {
+    padding-inline: 10px 12px;
+    gap: 6px;
+    font-size: 0.72rem;
+  }
+
+  .term-toast {
+    left: 12px;
+    right: 12px;
+    top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-mark,
+  .term-screen :global(.t-cursor) {
+    animation: none;
+  }
+
+  .term-toast,
+  .term-tab {
+    transition: none;
+  }
+}
+</style>

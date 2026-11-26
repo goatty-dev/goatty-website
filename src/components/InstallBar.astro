@@ -1,51 +1,69 @@
 ---
 import Icon from "@/components/Icon.astro";
+import { LATEST_RELEASE_URL } from "@/scripts/platform";
 
-interface DistroOption {
-  id: string;
-  label: string;
-  command: string;
-  note: string;
-}
+type InstallOption =
+  | {
+      id: string;
+      label: string;
+      kind: "command";
+      command: string;
+      note: string;
+    }
+  | { id: string; label: string; kind: "download"; note: string };
 
-const options: DistroOption[] = [
+const options: InstallOption[] = [
+  {
+    id: "windows",
+    label: "Windows",
+    kind: "download",
+    note: "Download the installer from the latest GitHub release and run it.",
+  },
   {
     id: "arch",
     label: "Arch Linux",
+    kind: "command",
     command: "paru -S goatty-bin",
-    note: "Available in the AUR. Also works with yay -S goatty-bin.",
+    note: "From the AUR. yay -S goatty-bin works too.",
   },
   {
     id: "debian",
     label: "Ubuntu / Debian",
+    kind: "command",
     command: "sudo apt install ./goatty_0.1.0-1_amd64.deb",
-    note: "Supports Ubuntu 22.04+ and Debian 12+. Download the .deb from GitHub Releases.",
+    note: "Ubuntu 22.04+ and Debian 12+. Get the .deb from GitHub Releases.",
   },
   {
     id: "fedora",
     label: "Fedora",
+    kind: "command",
     command: "sudo dnf install ./goatty-0.1.0-1.x86_64.rpm",
-    note: "Installs goatty, goattyd, desktop launcher, and shell completions.",
+    note: "Installs goatty, goattyd, the desktop launcher and shell completions.",
   },
   {
     id: "tarball",
     label: "Tarball",
+    kind: "command",
     command: "tar -xzf goatty-0.1.0-x86_64-linux.tar.gz && ./install.sh",
-    note: "No root required. Installs binaries into ~/.local/bin and bundled remote daemons.",
+    note: "No root needed. Installs into ~/.local/bin.",
   },
 ];
+
+const firstCommand = options.find((o) => o.kind === "command");
 ---
 
-<div class="install-widget" data-install-widget>
-  <div class="install-tabs" role="tablist" aria-label="Linux distribution">
-    {options.map((opt, index) => (
+<div class="install" data-install>
+  <div class="install-tabs" role="tablist" aria-label="Platform">
+    {options.map((opt, i) => (
       <button
         type="button"
         role="tab"
         class="install-tab"
-        aria-selected={index === 0 ? "true" : "false"}
+        aria-selected={i === 0 ? "true" : "false"}
+        tabindex={i === 0 ? 0 : -1}
         data-install-tab={opt.id}
-        data-command={opt.command}
+        data-kind={opt.kind}
+        data-command={opt.kind === "command" ? opt.command : undefined}
         data-note={opt.note}
       >
         {opt.label}
@@ -53,101 +71,131 @@ const options: DistroOption[] = [
     ))}
   </div>
 
-  <div class="command-strip">
-    <div class="command-line">
-      <span class="prompt pixel-text" aria-hidden="true">&gt;</span>
-      <code class="command-code" data-install-command
-        >{options[0].command}</code
-      >
-    </div>
-    <button
-      type="button"
-      class="copy-btn"
-      data-copy-btn
-      aria-label="Copy install command"
+  <div class="install-action">
+    <a
+      class="btn btn-primary install-download"
+      href={LATEST_RELEASE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-install-download
     >
-      <span class="copy-icon-wrap copy-icon-default" aria-hidden="true">
-        <Icon name="copy" size={15} />
-      </span>
-      <span class="copy-icon-wrap copy-icon-done" aria-hidden="true">
-        <Icon name="check" size={15} />
-      </span>
-      <span data-copy-label>Copy</span>
-    </button>
+      <Icon name="windows" size={17} />
+      <span>Download the Windows installer</span>
+    </a>
+
+    <div class="install-command" data-install-command-row hidden>
+      <span class="install-prompt" aria-hidden="true">❯</span>
+      <code data-install-command
+        >{firstCommand?.kind === "command" && firstCommand.command}</code
+      >
+      <button
+        type="button"
+        class="copy-btn"
+        data-copy-btn
+        aria-label="Copy install command"
+      >
+        <span class="copy-icon copy-icon-idle" aria-hidden="true">
+          <Icon name="copy" size={15} />
+        </span>
+        <span class="copy-icon copy-icon-done" aria-hidden="true">
+          <Icon name="check" size={15} />
+        </span>
+        <span data-copy-label>Copy</span>
+      </button>
+    </div>
   </div>
 
   <p class="install-note" data-install-note>{options[0].note}</p>
 </div>
 
 <script>
-function initInstallWidgets(): void {
-  const widgets = document.querySelectorAll<HTMLElement>(
-    "[data-install-widget]",
+import { detectPlatform } from "@/scripts/platform";
+
+function initInstall(root: HTMLElement): void {
+  const tabs = Array.from(
+    root.querySelectorAll<HTMLButtonElement>("[data-install-tab]"),
   );
+  const download = root.querySelector<HTMLElement>("[data-install-download]");
+  const commandRow = root.querySelector<HTMLElement>(
+    "[data-install-command-row]",
+  );
+  const command = root.querySelector<HTMLElement>("[data-install-command]");
+  const note = root.querySelector<HTMLElement>("[data-install-note]");
+  const copyBtn = root.querySelector<HTMLButtonElement>("[data-copy-btn]");
+  const copyLabel = root.querySelector<HTMLElement>("[data-copy-label]");
+  if (!download || !commandRow || !command || !note || !copyBtn || !copyLabel)
+    return;
 
-  for (const widget of widgets) {
-    const tabs =
-      widget.querySelectorAll<HTMLButtonElement>("[data-install-tab]");
-    const commandEl = widget.querySelector<HTMLElement>(
-      "[data-install-command]",
-    );
-    const noteEl = widget.querySelector<HTMLElement>("[data-install-note]");
-    const copyBtn = widget.querySelector<HTMLButtonElement>("[data-copy-btn]");
-    const copyLabel = widget.querySelector<HTMLElement>("[data-copy-label]");
+  let resetTimer = 0;
+  const resetCopy = () => {
+    copyBtn.classList.remove("is-copied");
+    copyLabel.textContent = "Copy";
+  };
 
-    if (!commandEl || !noteEl || !copyBtn || !copyLabel) continue;
-
-    let resetTimer = 0;
-
-    for (const tab of tabs) {
-      tab.addEventListener("click", () => {
-        for (const other of tabs) {
-          other.setAttribute("aria-selected", "false");
-        }
-        tab.setAttribute("aria-selected", "true");
-        commandEl.textContent = tab.dataset.command ?? "";
-        noteEl.textContent = tab.dataset.note ?? "";
-        copyBtn.classList.remove("is-copied");
-        copyLabel.textContent = "Copy";
-      });
+  const select = (tab: HTMLButtonElement) => {
+    for (const other of tabs) {
+      const active = other === tab;
+      other.setAttribute("aria-selected", String(active));
+      other.tabIndex = active ? 0 : -1;
     }
+    const isDownload = tab.dataset.kind === "download";
+    download.hidden = !isDownload;
+    commandRow.hidden = isDownload;
+    command.textContent = tab.dataset.command ?? "";
+    note.textContent = tab.dataset.note ?? "";
+    resetCopy();
+  };
 
-    copyBtn.addEventListener("click", async () => {
-      const text = commandEl.textContent ?? "";
-      if (!text) return;
-
-      try {
-        await navigator.clipboard.writeText(text);
-        copyBtn.classList.add("is-copied");
-        copyLabel.textContent = "Copied";
-        window.clearTimeout(resetTimer);
-        resetTimer = window.setTimeout(() => {
-          copyBtn.classList.remove("is-copied");
-          copyLabel.textContent = "Copy";
-        }, 1600);
-      } catch {
-        copyBtn.classList.remove("is-copied");
-        copyLabel.textContent = "Select manually";
-      }
+  tabs.forEach((tab, i) => {
+    tab.addEventListener("click", () => select(tab));
+    tab.addEventListener("keydown", (event) => {
+      const step =
+        event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+      if (!step) return;
+      event.preventDefault();
+      const next = tabs[(i + step + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
     });
-  }
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    const text = command.textContent ?? "";
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.classList.add("is-copied");
+      copyLabel.textContent = "Copied";
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(resetCopy, 1600);
+    } catch {
+      copyLabel.textContent = "Select and copy";
+    }
+  });
+
+  // Start on the visitor's platform: Windows, or Arch for everyone else.
+  const preferred = detectPlatform() === "windows" ? "windows" : "arch";
+  const initial = tabs.find((t) => t.dataset.installTab === preferred);
+  if (initial) select(initial);
 }
 
-initInstallWidgets();
+for (const root of document.querySelectorAll<HTMLElement>("[data-install]")) {
+  initInstall(root);
+}
 </script>
 
 <style>
-.install-widget {
+.install {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 720px;
+  gap: 20px;
+  width: 100%;
+  max-width: 680px;
 }
 
 .install-tabs {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 24px;
+  gap: 26px;
   border-bottom: 1px solid var(--border-hairline);
   overflow-x: auto;
   scrollbar-width: none;
@@ -162,14 +210,14 @@ initInstallWidgets();
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 0 0 12px;
   margin-bottom: -1px;
+  padding: 0 0 14px;
+  flex-shrink: 0;
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--ink-muted);
   white-space: nowrap;
-  flex-shrink: 0;
   cursor: pointer;
   transition:
     color 140ms ease,
@@ -185,35 +233,43 @@ initInstallWidgets();
   border-bottom-color: var(--accent-orange);
 }
 
-.command-strip {
+.install-action {
+  min-height: 56px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
-  border-radius: 6px;
-  padding: 12px 14px 12px 18px;
 }
 
-.command-line {
+.install-download[hidden],
+.install-command[hidden] {
+  display: none;
+}
+
+/* The command sits in a pill, like every other interactive element */
+.install-command {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  width: 100%;
+  min-height: 56px;
+  padding: 6px 6px 6px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background-color: var(--bg-surface);
+}
+
+.install-prompt {
+  color: var(--accent-orange);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.install-command code {
+  flex: 1;
   min-width: 0;
   overflow-x: auto;
-}
-
-.prompt {
-  color: var(--accent-orange);
-  font-size: 0.875rem;
-  flex-shrink: 0;
-  user-select: none;
-}
-
-.command-code {
+  scrollbar-width: none;
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--ink-primary);
   white-space: nowrap;
 }
@@ -222,41 +278,33 @@ initInstallWidgets();
   appearance: none;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 7px;
   flex-shrink: 0;
-  height: 32px;
-  padding-inline: 11px;
-  border-radius: 4px;
-  border: 1px solid var(--border-strong);
-  background-color: transparent;
+  height: 42px;
+  padding-inline: 14px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background-color: rgba(255, 255, 255, 0.07);
   color: var(--ink-primary);
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition:
     background-color 140ms ease,
-    border-color 140ms ease,
     color 140ms ease;
 }
 
-.copy-icon-wrap {
+.copy-btn:hover {
+  background-color: rgba(255, 255, 255, 0.13);
+}
+
+.copy-icon {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.copy-btn .copy-icon-done {
-  display: none;
-}
-
-.copy-btn.is-copied {
-  border-color: var(--accent-orange);
-  color: var(--accent-orange);
-}
-
-.copy-btn.is-copied .copy-icon-default {
+.copy-icon-done,
+.copy-btn.is-copied .copy-icon-idle {
   display: none;
 }
 
@@ -264,42 +312,37 @@ initInstallWidgets();
   display: inline-flex;
 }
 
-.copy-btn:hover {
-  background-color: var(--ink-primary);
-  border-color: var(--ink-primary);
-  color: var(--bg-canvas);
+.copy-btn.is-copied {
+  color: var(--accent-orange);
 }
 
 .install-note {
   font-size: 0.875rem;
-  color: var(--ink-muted);
   line-height: 1.5;
+  color: var(--ink-muted);
 }
 
 @media (max-width: 600px) {
   .install-tabs {
-    gap: 18px;
+    gap: 20px;
   }
 
-  .install-tab {
-    font-size: 0.875rem;
+  .install-command code {
+    font-size: 0.8rem;
   }
 
-  .command-strip {
-    align-items: flex-start;
-    padding: 10px 12px;
+  .copy-btn span[data-copy-label] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
   }
 
-  .command-line {
-    align-items: flex-start;
-    overflow-x: visible;
-    padding-top: 4px;
-  }
-
-  .command-code {
-    white-space: normal;
-    overflow-wrap: anywhere;
-    line-height: 1.45;
+  .copy-btn {
+    width: 42px;
+    padding: 0;
+    justify-content: center;
   }
 }
 

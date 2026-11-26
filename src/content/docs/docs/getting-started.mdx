@@ -1,17 +1,21 @@
 ---
 title: Getting started
-description: Install goatty on Linux, launch your managed Zsh environment, and customize everything visually in GPUI Settings.
+description: Install goatty on Linux or Windows, launch your managed Zsh environment, and customize everything visually in GPUI Settings.
 ---
 
 import { Aside, Card, CardGrid, LinkCard, Steps, TabItem, Tabs } from "@astrojs/starlight/components";
 
-`goatty` is a fast, batteries-included GPU terminal for Linux (with native macOS and Windows builds planned). On first launch, it gives you a complete managed Zsh shell, visual GPUI Settings, editor-style shortcuts, and persistent `goattyd` sessions without touching your existing dotfiles.
+`goatty` is a fast, batteries-included GPU terminal for Linux and Windows (a native macOS build is planned). On first launch, it gives you a complete managed Zsh shell, visual GPUI Settings, editor-style shortcuts, and persistent `goattyd` sessions without touching your existing dotfiles.
 
-## Install on Linux
+## Install
 
-Choose your Linux package or install from the standalone tarball without root access.
+On Windows, use the installer. On Linux, choose your distribution's package or install from the standalone tarball without root access.
 
 <Tabs>
+  <TabItem label="Windows" icon="seti:windows">
+    Download the Windows installer from the [latest GitHub release](https://github.com/goatty-dev/goatty/releases/latest) and run it.
+  </TabItem>
+
   <TabItem label="Arch Linux" icon="linux">
     Install directly from the AUR with `paru` or `yay`:
 
@@ -130,12 +134,12 @@ Choose your Linux package or install from the standalone tarball without root ac
   />
   <LinkCard
     title="Download latest releases"
-    description="Grab .deb, .rpm, or tarball builds from GitHub Releases."
+    description="Grab the Windows installer, .deb, .rpm, or tarball builds from GitHub Releases."
     href="https://github.com/goatty-dev/goatty/releases"
   />
   <LinkCard
     title="Source & issue tracker"
-    description="Browse the codebase, report bugs, or follow macOS and Windows progress."
+    description="Browse the codebase, report bugs, or follow macOS progress."
     href="https://github.com/goatty-dev/goatty"
   />
 </CardGrid>

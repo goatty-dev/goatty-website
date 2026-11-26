@@ -18,7 +18,7 @@ export default defineConfig({
     starlight({
       title: "goatty",
       description:
-        "Documentation for goatty — the GPU-rendered Linux terminal with managed Zsh, visual GPUI settings, and persistent daemon sessions.",
+        "Documentation for goatty — the GPU-rendered terminal for Linux and Windows with managed Zsh, visual GPUI settings, and persistent daemon sessions.",
       disable404Route: true,
       credits: false,
       favicon: "/favicon.svg",

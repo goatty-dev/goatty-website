@@ -1,0 +1,181 @@
+---
+import { ICONS } from "@/scripts/heroTerminal";
+
+/**
+ * Replaces the old dither-card grid and the "unified stack" list.
+ * One row per thing that works on first launch: what it is, what it looks
+ * like in the terminal, and what it does for you. No boxes; the rows are a
+ * table, so hairlines separate them like one.
+ */
+
+// Samples are tiny HTML strings so the spacing between colored tokens is
+// exact; source formatting would otherwise collapse or add spaces.
+const t = (cls: string, text: string) => `<span class="${cls}">${text}</span>`;
+const k = (...keys: string[]) =>
+  keys.map((key) => `<kbd>${key}</kbd>`).join("");
+const then = (word: string) => `<span class="bi-then">${word}</span>`;
+const caret = t("t-caret", "❯");
+
+const rows = [
+  {
+    name: "Autosuggestions",
+    sample: `${caret} ${t("t-ok", "cargo")} t${t("t-ghost", "est --workspace")}`,
+    desc: "Ghost text from your history as you type. Press → to take it.",
+  },
+  {
+    name: "Syntax highlighting",
+    sample: `${caret} ${t("t-err", "gti")} status ${then("then")} ${t("t-ok", "git")} status`,
+    desc: "Typos turn red and real commands turn green, before you press Enter.",
+  },
+  {
+    name: "Snippets & expansions",
+    sample: `${t("t-dim", "|")} ${t("t-snip", "first 20 lines")} ${then("becomes")} ${t("t-dim", "|")} ${t("t-ok", "head")} ${t("t-flag", "-n")} 20`,
+    desc: "Say what you want in plain English and get the real command. Nothing runs until you press Enter yourself.",
+  },
+  {
+    name: "Fuzzy search",
+    sample: `${k("Ctrl", "R")} <span class="bi-query">docker comp</span>`,
+    desc: "Find any command you have run from a fragment, and pick completions from a searchable list with previews.",
+  },
+  {
+    name: "A prompt that informs",
+    sample: `${t("t-dir", `${ICONS.folder}  ~/code/api`)}  ${t("t-git", `${ICONS.branch} main`)} ${t("t-warn", "!1")}  ${t("t-lang", `${ICONS.rust} 1.83`)}  ${t("t-flag", `${ICONS.clock} 3s`)}`,
+    desc: "Starship shows the branch, the language and how long the last command took.",
+  },
+  {
+    name: "Shortcuts you already know",
+    sample: `${k("Ctrl", "C")} ${then("copies,")} ${k("Ctrl", "V")} ${then("pastes")}`,
+    desc: "With text selected, Ctrl+C copies instead of stopping your program. Rebind any key in Settings.",
+  },
+];
+---
+
+<section id="built-in" class="built-in">
+  <div class="container">
+    <header class="bi-head">
+      <h2>Works on the first command</h2>
+      <p>
+        The shell setup people spend a weekend wiring together ships turned on.
+        Your <code>~/.zshrc</code> is never edited, and each piece can be
+        switched off in Settings.
+      </p>
+    </header>
+
+    <dl class="bi-rows">
+      {rows.map((row) => (
+        <div class="bi-row">
+          <dt>{row.name}</dt>
+          <dd class="bi-sample" aria-hidden="true" set:html={row.sample} />
+          <dd class="bi-desc">{row.desc}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+.built-in {
+  padding-block: clamp(96px, 11vw, 150px) clamp(56px, 7vw, 100px);
+}
+
+.bi-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px 64px;
+  align-items: end;
+  margin-bottom: clamp(36px, 5vw, 56px);
+}
+
+.bi-head h2 {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  max-width: 12ch;
+}
+
+.bi-head p {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  max-width: 46ch;
+}
+
+.bi-head code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--ink-primary);
+}
+
+.bi-rows {
+  margin: 0;
+}
+
+.bi-row {
+  display: grid;
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 10px 40px;
+  align-items: baseline;
+  padding-block: 26px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.bi-row:last-child {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.bi-row dt {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink-primary);
+}
+
+.bi-row dd {
+  margin: 0;
+}
+
+.bi-sample {
+  font-family: var(--font-term);
+  white-space: pre-wrap;
+  font-size: 0.9375rem;
+  line-height: 2;
+  color: var(--ink-secondary);
+}
+
+.bi-sample :global(kbd + kbd) {
+  margin-left: 4px;
+}
+
+.bi-sample :global(.bi-then) {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  padding-inline: 0.8ch;
+}
+
+.bi-sample :global(.bi-query) {
+  padding-left: 1ch;
+  color: var(--ink-primary);
+  border-bottom: 1px solid var(--accent-orange);
+}
+
+.bi-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  max-width: 44ch;
+}
+
+@media (max-width: 900px) {
+  .bi-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bi-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding-block: 22px;
+  }
+}
+</style>

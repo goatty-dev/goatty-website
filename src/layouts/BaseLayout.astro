@@ -7,8 +7,8 @@ interface Props {
 }
 
 const {
-  title = "goatty — Fast, batteries-included GPU terminal for Linux",
-  description = "A GPU-rendered terminal for Linux with a managed Zsh setup, remote SSH sessions, and persistent daemon state.",
+  title = "goatty — Fast, batteries-included GPU terminal for Linux and Windows",
+  description = "A GPU-rendered terminal for Linux and Windows with a managed Zsh setup, remote SSH sessions, and persistent daemon state.",
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
@@ -18,6 +18,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script is:inline>
+    document.documentElement.classList.add("js");
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#080809" />
     <meta name="generator" content={Astro.generator} />
