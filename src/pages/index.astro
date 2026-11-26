@@ -70,7 +70,7 @@ import { RELEASES_URL, REPO_URL } from "@/scripts/platform";
                 </span>
                 <span class="cta-variant" data-cta="windows" hidden>
                   <Icon name="windows" size={17} />
-                  <span>Download for Windows</span>
+                  <span>Install on Windows</span>
                 </span>
                 <span class="cta-variant" data-cta="linux" hidden>
                   <Icon name="linux" size={17} />
@@ -105,9 +105,9 @@ import { RELEASES_URL, REPO_URL } from "@/scripts/platform";
           <div class="closing-copy">
             <h2>Get goatty</h2>
             <p>
-              Packages for the major Linux distributions and an installer for
-              Windows. Your existing shell and dotfiles stay exactly as they
-              are.
+              One command on Linux and Windows, no root or administrator rights
+              needed, plus packages for the major Linux distributions. Your
+              existing shell and dotfiles stay exactly as they are.
             </p>
             <p class="closing-links">
               <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer">
@@ -152,7 +152,7 @@ import { RELEASES_URL, REPO_URL } from "@/scripts/platform";
 
 <script>
 import { initDitherWordmark } from "@/scripts/dither3d";
-import { detectPlatform, LATEST_RELEASE_URL } from "@/scripts/platform";
+import { detectPlatform } from "@/scripts/platform";
 
 initDitherWordmark();
 
@@ -164,11 +164,6 @@ if (cta) {
     platform === "windows" || platform === "linux" ? platform : "default";
   for (const el of cta.querySelectorAll<HTMLElement>("[data-cta]")) {
     el.hidden = el.dataset.cta !== variant;
-  }
-  if (platform === "windows") {
-    cta.href = LATEST_RELEASE_URL;
-    cta.target = "_blank";
-    cta.rel = "noopener noreferrer";
   }
 }
 

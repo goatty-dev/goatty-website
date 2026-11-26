@@ -1,55 +1,52 @@
 ---
 import Icon from "@/components/Icon.astro";
-import { LATEST_RELEASE_URL } from "@/scripts/platform";
 
-type InstallOption =
-  | {
-      id: string;
-      label: string;
-      kind: "command";
-      command: string;
-      note: string;
-    }
-  | { id: string; label: string; kind: "download"; note: string };
+type InstallOption = {
+  id: string;
+  label: string;
+  command: string;
+  note: string;
+};
+
+// /install.sh and /install.ps1 redirect to goatty's one-line installers
+// (public/_redirects).
+const site =
+  Astro.site ?? new URL("https://goatty-website.goatty-dev.workers.dev");
+const installSh = new URL("/install.sh", site).href;
+const installPs1 = new URL("/install.ps1", site).href;
 
 const options: InstallOption[] = [
   {
     id: "windows",
     label: "Windows",
-    kind: "download",
-    note: "Download the installer from the latest GitHub release and run it.",
+    command: `irm ${installPs1} | iex`,
+    note: "In PowerShell. Installs for your user only, with no administrator rights, and adds goatty to your PATH and the Start Menu. Run it again to upgrade.",
+  },
+  {
+    id: "linux",
+    label: "Linux",
+    command: `curl -fsSL ${installSh} | sh`,
+    note: "Any distro with glibc 2.35+ (x86_64). No root needed: installs into ~/.local. Run it again to upgrade.",
   },
   {
     id: "arch",
     label: "Arch Linux",
-    kind: "command",
     command: "paru -S goatty-bin",
     note: "From the AUR. yay -S goatty-bin works too.",
   },
   {
     id: "debian",
     label: "Ubuntu / Debian",
-    kind: "command",
     command: "sudo apt install ./goatty_0.1.0-1_amd64.deb",
     note: "Ubuntu 22.04+ and Debian 12+. Get the .deb from GitHub Releases.",
   },
   {
     id: "fedora",
     label: "Fedora",
-    kind: "command",
     command: "sudo dnf install ./goatty-0.1.0-1.x86_64.rpm",
     note: "Installs goatty, goattyd, the desktop launcher and shell completions.",
   },
-  {
-    id: "tarball",
-    label: "Tarball",
-    kind: "command",
-    command: "tar -xzf goatty-0.1.0-x86_64-linux.tar.gz && ./install.sh",
-    note: "No root needed. Installs into ~/.local/bin.",
-  },
 ];
-
-const firstCommand = options.find((o) => o.kind === "command");
 ---
 
 <div class="install" data-install>
@@ -62,8 +59,7 @@ const firstCommand = options.find((o) => o.kind === "command");
         aria-selected={i === 0 ? "true" : "false"}
         tabindex={i === 0 ? 0 : -1}
         data-install-tab={opt.id}
-        data-kind={opt.kind}
-        data-command={opt.kind === "command" ? opt.command : undefined}
+        data-command={opt.command}
         data-note={opt.note}
       >
         {opt.label}
@@ -72,22 +68,9 @@ const firstCommand = options.find((o) => o.kind === "command");
   </div>
 
   <div class="install-action">
-    <a
-      class="btn btn-primary install-download"
-      href={LATEST_RELEASE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-install-download
-    >
-      <Icon name="windows" size={17} />
-      <span>Download the Windows installer</span>
-    </a>
-
-    <div class="install-command" data-install-command-row hidden>
+    <div class="install-command">
       <span class="install-prompt" aria-hidden="true">❯</span>
-      <code data-install-command
-        >{firstCommand?.kind === "command" && firstCommand.command}</code
-      >
+      <code data-install-command>{options[0].command}</code>
       <button
         type="button"
         class="copy-btn"
@@ -115,16 +98,11 @@ function initInstall(root: HTMLElement): void {
   const tabs = Array.from(
     root.querySelectorAll<HTMLButtonElement>("[data-install-tab]"),
   );
-  const download = root.querySelector<HTMLElement>("[data-install-download]");
-  const commandRow = root.querySelector<HTMLElement>(
-    "[data-install-command-row]",
-  );
   const command = root.querySelector<HTMLElement>("[data-install-command]");
   const note = root.querySelector<HTMLElement>("[data-install-note]");
   const copyBtn = root.querySelector<HTMLButtonElement>("[data-copy-btn]");
   const copyLabel = root.querySelector<HTMLElement>("[data-copy-label]");
-  if (!download || !commandRow || !command || !note || !copyBtn || !copyLabel)
-    return;
+  if (!command || !note || !copyBtn || !copyLabel) return;
 
   let resetTimer = 0;
   const resetCopy = () => {
@@ -138,9 +116,6 @@ function initInstall(root: HTMLElement): void {
       other.setAttribute("aria-selected", String(active));
       other.tabIndex = active ? 0 : -1;
     }
-    const isDownload = tab.dataset.kind === "download";
-    download.hidden = !isDownload;
-    commandRow.hidden = isDownload;
     command.textContent = tab.dataset.command ?? "";
     note.textContent = tab.dataset.note ?? "";
     resetCopy();
@@ -173,8 +148,9 @@ function initInstall(root: HTMLElement): void {
     }
   });
 
-  // Start on the visitor's platform: Windows, or Arch for everyone else.
-  const preferred = detectPlatform() === "windows" ? "windows" : "arch";
+  // Start on the visitor's platform: Windows, or the Linux one-liner for
+  // everyone else.
+  const preferred = detectPlatform() === "windows" ? "windows" : "linux";
   const initial = tabs.find((t) => t.dataset.installTab === preferred);
   if (initial) select(initial);
 }
@@ -237,11 +213,6 @@ for (const root of document.querySelectorAll<HTMLElement>("[data-install]")) {
   min-height: 56px;
   display: flex;
   align-items: center;
-}
-
-.install-download[hidden],
-.install-command[hidden] {
-  display: none;
 }
 
 /* The command sits in a pill, like every other interactive element */
