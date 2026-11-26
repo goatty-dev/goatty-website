@@ -1,0 +1,71 @@
+---
+title: Sync across hosts
+description: Keep one shell setup on every machine you use, with per-host overrides, and without trusting any server with your laptop.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+goatty can give every [host](/docs/using/remote-hosts) the same shell: the same prompt, aliases, snippets, history settings and [plugins](/docs/customize/plugins). You change something once, and it reaches your other machines.
+
+## What's shared
+
+**Shared:** prompt, aliases, snippets and expansions, history settings, [PATH folders](goatty://settings/path), managed-shell features, and plugins from a registry together with their settings.
+
+**Stays on each host:** the [shell program](goatty://settings/shell?setting=shell.program) and what's imported from that host's own dotfiles.
+
+Window settings (fonts, theme, shortcuts) live on your computer and aren't part of this. To move those, use [profiles](/docs/customize/settings#profiles-export-and-import).
+
+## Follow, or stay separate
+
+Each host either **follows** the shared config or keeps its own. The first time you connect to a host, goatty asks:
+
+> **Use your goatty setup on *myserver*?**
+> **Follow shared config** · **Keep separate**
+
+If the host already has its own changes, the question lists them and adds **Keep myserver's differences as overrides** and **Replace with shared**. A host whose goattyd goatty just installed joins without asking.
+
+You can change your mind with the switch for each host under [Settings → Hosts → Shared shell config](goatty://settings/hosts), which also shows the last sync, and a **Sync now** button.
+
+## Edit once, or per host
+
+The shell pages (Prompt, Aliases, History, Plugins …) have a **scope picker** in the header:
+
+- **All synced hosts** changes the shared config. Every host that follows it picks the change up.
+- **A single host** sets an *override* for that host only. Rows show where a value comes from: *Overridden on myserver*, *Only on myserver · Use shared value*, or *This host only*.
+
+Installing or removing a registry plugin under *All synced hosts* does so on every host.
+
+If you change something directly on a host (for example `goattyd settings set`, or a rollback there), it becomes that host's override, and the Hosts page offers **Share** or **Keep on myserver only**.
+
+### Edits from two places
+
+You don't resolve conflicts. Changes to different settings all survive. If two machines change the same setting, the newer change wins, and the value that lost is recorded in the generation history, where you can restore it from [Profile](goatty://settings/profile).
+
+## When it syncs
+
+goatty syncs when you connect to a host, after a reconnect, after you edit, and on **Sync now**. Hosts never talk to each other. Your goatty window carries changes between them, so a host that is offline picks up changes the next time you connect.
+
+For plugins, a following host installs or updates a shared plugin by itself only when it comes from a registry that host trusts, and the install plan is exactly what you approved. Anything else waits on the Hosts page for you to review it. Plugins removed from the shared config are uninstalled, except ones you installed from a local folder.
+
+## Trust
+
+Every change is signed by the device that made it. A computer only accepts changes from devices it trusts: its own, every client that has connected to its goattyd (they could run commands there anyway), and devices those vouch for.
+
+This means a server you connect to **can't push settings onto your laptop**, even if someone edits its files. If changes arrive from one of your other computers that this one doesn't know yet, goatty asks once: **Trust** or **Ignore**.
+
+<Aside type="note">
+  You need goatty on both ends, and a recent goattyd on the host. When the host's goattyd is too old for this, goatty offers **Update and restart**. Older ones still get the old behavior (a toast offering **Sync**, **Always sync this host** or **Not now**).
+</Aside>
+
+## From the command line
+
+```bash
+goatty sync myserver other-box --join        # make these hosts follow the shared config
+goatty sync myserver --join --keep           # …and keep their own differences as overrides
+goatty sync myserver --separate              # keep it on its own
+
+goattyd sync status                          # on a host: does it follow, what's pending
+goattyd sync apply                           # on a host: apply the shared config now
+goattyd settings set history.size 5000 --shared   # change it for every host
+goattyd settings set history.size 5000 --host     # only this host (the default)
+```

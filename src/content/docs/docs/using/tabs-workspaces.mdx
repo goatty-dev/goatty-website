@@ -1,0 +1,83 @@
+---
+title: Tabs, panes & workspaces
+description: Split your terminal into panes, organize tabs, and keep named workspaces that every window can share.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+```text
+goattyd
+ └─ workspace   a named set of tabs, shared by every window that shows it
+     └─ tab
+         └─ pane   one shell (split a tab to get more)
+```
+
+## Tabs
+
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> opens a tab in the current pane's directory. Right-click the **+** for a tab on another host, a detached tab, or a new window. Right-click a tab to rename, duplicate, move or close it.
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>PgDn</kbd> | Next tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>PgUp</kbd> | Previous tab |
+| <kbd>Alt</kbd>+<kbd>1</kbd> … <kbd>8</kbd>, <kbd>Alt</kbd>+<kbd>9</kbd> | Go to that tab, or the last one |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Move the tab left / right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | Close the pane (the tab, with its last pane) |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> | New window on the same workspace |
+
+Background tabs show a mark when a command finishes or fails, or when a program rings the bell. Tabs for [coding agents](/docs/using/coding-agents) show what the agent is doing.
+
+Pick the look under [Workspace → Tabs](goatty://settings/workspace?setting=tabs.style): **modern** browser-style tabs, a **compact** one-line bar, or a **vertical** sidebar that can fold down to icons (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>). Tabs on other hosts are grouped under the host's name, and you can [give each host a color](goatty://settings/hosts?setting=ssh.hosts).
+
+<Aside type="tip">
+  <kbd>Alt</kbd>+digit and <kbd>Alt</kbd>+arrow only act when there's such a tab or pane. Otherwise the key goes to your shell, so a single pane loses nothing.
+</Aside>
+
+## Panes
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> | Split right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> | Split down |
+| <kbd>Alt</kbd>+<kbd>←↑↓→</kbd> | Move between panes |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>←↑↓→</kbd> | Resize |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Zoom the pane to fill the tab, and back |
+
+The palette has more: split left or up, swap or rotate panes, make them equal, move a pane to a new or another tab, or merge a tab into this one. Bind them on the [Shortcuts page](goatty://settings/shortcuts). New panes start in the focused pane's directory, on the same host.
+
+Closing a pane ends its shell. If a program is running, goatty asks first, and offers **Detach** to keep it running. See [Sessions & detaching](/docs/using/sessions).
+
+## Workspaces
+
+A workspace is a named set of tabs, with their splits, that lives on a host's goattyd. If you know tmux, it's the equivalent of a *session* (goatty's *tab* is tmux's *window*).
+
+You start with one workspace, **Main**, and see no workspace UI until you make a second one. That's the whole point: workspaces are there when you want separate contexts, such as one per project, and out of the way when you don't.
+
+- **Shared live.** Every window that shows a workspace sees the same tabs, splits and names, and changes appear in the other windows right away.
+- **Per window.** Which tab is active, which pane has focus, zoom, scroll position and window size.
+- **One per host.** A window shows one workspace for each host it has tabs on. Switching changes only that host's tabs.
+
+### Use them
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>W</kbd> | Open the switcher |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>PgDn</kbd> / <kbd>PgUp</kbd> | Next / previous workspace |
+
+New, rename and close have no default keys. Find them in the palette (**New workspace**, **Switch workspace…**) or in the new-tab menu's **Workspace** submenu.
+
+Once you have two workspaces, a chip appears at the left of the tab bar. It shows a dot when something happened in a workspace you're not looking at. Click it to switch, double-click to rename. The switcher also offers **Open in new window**, to see two workspaces side by side.
+
+Closing a workspace asks what to do with running shells: move its tabs to another workspace (the default) or end them. A host's last workspace can't be closed.
+
+### When goatty starts
+
+[**Workspace → When goatty starts**](goatty://settings/workspace?setting=workspace.on_launch) decides what `goatty` shows:
+
+| Option | Result |
+| --- | --- |
+| **Restore every window** (default) | Every window you had open, with its workspace on every host, local and remote |
+| **Restore this computer's tabs** | Only this computer's most recent workspace. Remote hosts wait until you connect. |
+| **Start a new session** | A new window on your latest workspace, with a fresh tab |
+
+`goatty --new` forces the last behavior for one launch. `goattyd workspaces` lists workspaces, their tabs and the windows showing them.

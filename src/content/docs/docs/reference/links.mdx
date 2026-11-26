@@ -1,0 +1,50 @@
+---
+title: goatty:// links
+description: Links that open a settings page, a single setting or a plugin review in your running goatty. Used throughout these docs.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A `goatty://` link opens a specific place in goatty. These docs and the plugin registry use them, so you can go from "turn on X" to the setting itself in one click.
+
+Try one: [Settings → Terminal → Open links](goatty://settings/terminal?setting=links.open_on)
+
+If goatty is running, the link opens in it. If not, goatty starts and then opens it.
+
+## Link format
+
+| Link | Opens |
+| --- | --- |
+| `goatty://settings` | The settings window |
+| `goatty://settings/<page>` | A page, for example `goatty://settings/prompt` |
+| `goatty://settings/<page>?setting=<key>` | The page, scrolled to a row and highlighting it, for example `goatty://settings/terminal?setting=links.open_on` |
+| `goatty://plugins` | Settings → Plugins → Browse |
+| `goatty://plugins/<id>` | The plugin's install review, or its page if it's installed |
+
+Pages: `appearance`, `terminal`, `workspace`, `shortcuts`, `hosts`, `network`, `shell`, `dotfiles`, `path`, `prompt`, `history`, `aliases`, `snippets`, `plugins`, `diagnostics`, `profile`, `about`. Some aliases work too (`ssh` for hosts, `tailscale` for network, `theme` for appearance).
+
+The `setting` is the dotted key as it appears in `settings.json` or `host.json`, such as `font.size` or `history.size`. `goatty settings show --all` (window settings) and `goattyd settings show --all` (shell settings) print them as JSON, where nested names are joined with dots (`font` → `size` is `font.size`). Plugin links can also carry `?version=1.2.3&registry=name`.
+
+If a link names something this goatty doesn't know, for example because the docs are newer than your install, it lands on the closest page and shows a toast saying so.
+
+## Links are safe: they only navigate
+
+A web page can trigger a `goatty://` link, so goatty treats them as untrusted:
+
+- A link **never changes a setting**, types or runs a command, connects to a host, or adds a registry.
+- A plugin link only opens the normal review, with its permissions and shell code shown. Installing still needs your explicit confirmation.
+- Plugins are looked up only in registries you already have. A link can't add one.
+- Plugin links apply to the host the settings window is on (the host of your active tab), and the review names it.
+
+## Opening a link from a terminal
+
+```bash
+goatty open "goatty://settings/prompt"
+goatty goatty://plugins/eza       # shorthand
+```
+
+The Linux packages and `install.sh` register the `goatty://` scheme with your desktop, so clicking one in a browser opens goatty. The Windows installer doesn't register it yet. There, use `goatty open` from a terminal.
+
+<Aside type="note">
+  Your browser may ask before opening goatty. That's expected for any app link.
+</Aside>

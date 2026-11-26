@@ -1,145 +1,130 @@
 ---
 title: Getting started
-description: Install goatty on Linux or Windows, launch your managed Zsh environment, and customize everything visually in GPUI Settings.
+description: Install goatty on Linux or Windows, take the first-run tour, and learn the few shortcuts and ideas that matter on day one.
 ---
 
 import { Aside, Card, CardGrid, LinkCard, Steps, TabItem, Tabs } from "@astrojs/starlight/components";
 
-`goatty` is a fast, batteries-included GPU terminal for Linux and Windows (a native macOS build is planned). On first launch, it gives you a complete managed Zsh shell, visual GPUI Settings, editor-style shortcuts, and persistent `goattyd` sessions without touching your existing dotfiles.
+goatty is a fast GPU terminal for Linux and Windows (macOS is planned). It comes with a ready-to-use shell, a settings window for everything, and sessions that keep running when you close the window.
 
 ## Install
 
-On Windows, use the installer. On Linux, choose your distribution's package or install from the standalone tarball without root access.
-
 <Tabs>
   <TabItem label="Windows" icon="seti:windows">
-    Download the Windows installer from the [latest GitHub release](https://github.com/goatty-dev/goatty/releases/latest) and run it.
+    Windows 10/11 (x86_64). Download from the [latest release](https://github.com/goatty-dev/goatty/releases/latest) and use either:
+
+    - **`goatty-<version>-x86_64-windows.msi`** installs for your user only, with no administrator rights. It adds goatty to your `PATH` and the Start Menu. Uninstall it from *Settings → Apps*.
+    - **`goatty-<version>-x86_64-windows.zip`**: extract anywhere and run `goatty.exe`.
+
+    The builds aren't code-signed yet, so SmartScreen may warn you. Choose *More info → Run anyway*.
   </TabItem>
 
   <TabItem label="Arch Linux" icon="linux">
-    Install directly from the AUR with `paru` or `yay`:
+    From the AUR:
 
     ```bash
-    paru -S goatty-bin
-    ```
-
-    If you use `yay`:
-
-    ```bash
-    yay -S goatty-bin
+    paru -S goatty-bin    # or: yay -S goatty-bin
     ```
   </TabItem>
 
   <TabItem label="Ubuntu / Debian" icon="linux">
-    Supports **Ubuntu 22.04+** and **Debian 12+**. Download the `.deb` package from [GitHub Releases](https://github.com/goatty-dev/goatty/releases) and install it with `apt`:
+    Ubuntu 22.04+ and Debian 12+. Download the `.deb` from [GitHub Releases](https://github.com/goatty-dev/goatty/releases):
 
     ```bash
-    sudo apt install ./goatty_0.1.0-1_amd64.deb
+    sudo apt install ./goatty_<version>-1_amd64.deb
     ```
   </TabItem>
 
   <TabItem label="Fedora" icon="linux">
-    Download the `.rpm` package from [GitHub Releases](https://github.com/goatty-dev/goatty/releases) and install with `dnf`. This includes `goatty`, `goattyd`, the desktop launcher, and shell completions:
+    Download the `.rpm` from [GitHub Releases](https://github.com/goatty-dev/goatty/releases):
 
     ```bash
-    sudo dnf install ./goatty-0.1.0-1.x86_64.rpm
+    sudo dnf install ./goatty-<version>-1.x86_64.rpm
     ```
   </TabItem>
 
-  <TabItem label="Tarball (No root)" icon="seti:zip">
-    Extract the release tarball and run the bundled installer. Binaries and remote daemons are installed into `~/.local/bin`:
+  <TabItem label="Tarball (no root)" icon="seti:zip">
+    Works on any distro. Extract the archive and run the installer. It puts `goatty` and `goattyd` in `~/.local/bin` and adds a launcher to your application menu:
 
     ```bash
-    tar -xzf goatty-0.1.0-x86_64-linux.tar.gz && ./install.sh
+    tar -xzf goatty-<version>-x86_64-linux.tar.gz && ./install.sh
     ```
+
+    Add `~/.local/bin` to your `PATH` to start goatty from a terminal.
   </TabItem>
 </Tabs>
 
-<Aside type="tip" title="Your ~/.zshrc stays untouched">
-  `goatty` runs its managed Zsh layer (`autosuggestions`, `fzf`, `starship`, syntax highlighting, and guided snippets) cleanly alongside your existing configuration — nothing in `~/.zshrc` is overwritten.
-</Aside>
+Each release page lists the exact commands for that version.
 
 ## First launch
 
 <Steps>
-1. **Open `goatty`**
+1. **Open goatty** from your application launcher, the Start Menu, or by running `goatty`.
 
-   Launch `goatty` from your application launcher or run `goatty` from an existing terminal.
+2. **Take the welcome tour.**
 
-2. **Start typing with managed Zsh**
+   On the very first start goatty opens a short setup window: pick a theme and text size, install the shell tools (downloaded into goatty's own folder, no `sudo`), and choose whether to import the `PATH` your existing shell setup builds. Reopen it any time from the command palette: **Welcome and setup**.
 
-   Inline autosuggestions, live syntax checking (valid commands highlight green, typos highlight red), fuzzy `fzf` history search, and plain-English snippets work immediately:
+3. **Start typing.**
 
-   ```sh
-   $ | first 20 lines   # expands to -> | head -n 20
-   ```
+   You get inline suggestions, live syntax highlighting, fuzzy history search on <kbd>Ctrl</kbd>+<kbd>R</kbd>, and a good prompt. See [Managed shell](/docs/using/managed-zsh).
 
-3. **Open GPUI Settings**
+4. **Open settings** with <kbd>Ctrl</kbd>+<kbd>,</kbd>.
 
-   Adjust themes, fonts, Starship prompt styles, `PATH` folders (add, reorder, toggle), aliases, snippets, and curated plugins visually — no config syntax or Lua to learn. Any change can be switched across profiles or rolled back in Settings.
-
-4. **Connect remote hosts or keep agents running**
-
-   Pair over Tailscale or connect via SSH to sync your exact managed Zsh, prompt, and plugins onto remote machines. Background processes and AI agents (`Claude Code`, `Codex`, `OpenCode`, `Antigravity`) stay alive inside `goattyd` even when you close the window.
+   Use *Search settings* at the top to find anything by name or by what it does.
 </Steps>
 
-## What ships built in
+<Aside type="tip" title="Your dotfiles are safe">
+  goatty never edits your `~/.zshrc` or other dotfiles. The one exception is opt-in: [Use goatty's shell in every terminal](/docs/using/managed-zsh#goattys-shell-in-every-terminal) adds a single guarded line to `.zshenv`, which you can remove again.
+</Aside>
 
-<CardGrid>
-  <Card title="Managed Zsh" icon="seti:shell">
-    Autosuggestions, syntax checks, Starship prompt, `fzf-tab`, and plain-English snippets ready on first command.
-  </Card>
-  <Card title="GPUI Settings" icon="setting">
-    Visual controls for themes, fonts, `PATH` management, aliases, snippets, and one-click plugins with profile rollback.
-  </Card>
-  <Card title="Editor feel" icon="laptop">
-    Standard desktop copy/paste (<kbd>Ctrl</kbd>+<kbd>C</kbd> on selection, <kbd>Ctrl</kbd>+<kbd>V</kbd>), instant scrollback search, and rebindable keybinds.
-  </Card>
-  <Card title="Tailscale, SSH & goattyd" icon="server">
-    Same managed shell across hosts, lazy scrollback sync for weak Wi-Fi, and persistent daemon sessions with live tab alerts.
-  </Card>
-</CardGrid>
+## The ideas to know
 
-## Default essentials
+| Term | What it is |
+| --- | --- |
+| **Pane** | One terminal, with its own shell. Split a tab to get more. |
+| **Tab** | A set of panes. |
+| **Workspace** | A named set of tabs, shared by every window that shows it. See [Tabs, panes & workspaces](/docs/using/tabs-workspaces). |
+| **goattyd** | The small background program that owns your shells, so they outlive the window. Starts by itself. |
+| **Host** | A computer running goattyd: this one, or another over [SSH or Tailscale](/docs/using/remote-hosts). |
 
-| Area | Default behavior | Where to customize |
-| --- | --- | --- |
-| Copy / Paste | <kbd>Ctrl</kbd>+<kbd>C</kbd> (with selection) & <kbd>Ctrl</kbd>+<kbd>V</kbd> | GPUI Settings → Keybinds |
-| Shell plugins | `autosuggestions`, `fzf`, `starship`, highlighting | GPUI Settings → Plugins |
-| PATH & Aliases | Add, reorder, or toggle visually | GPUI Settings → Shell |
-| Remote sync | Tailscale pairing & SSH host sync | Host switcher / `goattyd` |
+**Closing a window doesn't end your shells.** It *detaches*, and the next time you start goatty everything is back. To actually end a shell, close its pane or tab. See [Sessions & detaching](/docs/using/sessions).
+
+## Shortcuts worth learning first
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Command palette: search every action |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Settings |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> | New tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> / <kbd>O</kbd> | Split right / down |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | [Snippets](/docs/using/snippets): find a command and fill it in |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> | Connect to another host |
+| <kbd>Ctrl</kbd>+<kbd>C</kbd> | Copies when text is selected, interrupts otherwise |
+
+Everything is rebindable. The full list is on the [shortcuts reference](/docs/reference/shortcuts).
 
 ## Next steps
 
 <CardGrid>
   <LinkCard
-    title="Managed Zsh"
-    description="What the managed shell sets up, and how it coexists with your dotfiles."
-    href="/docs/using/managed-zsh"
+    title="Terminal basics"
+    description="Copy and paste, links, searching output, jumping between commands."
+    href="/docs/using/terminal"
   />
   <LinkCard
-    title="Snippets & expansions"
-    description="Find commands by what you want to do, and read them before they run."
-    href="/docs/using/snippets"
+    title="Tabs, panes & workspaces"
+    description="Organize your work and keep it across windows."
+    href="/docs/using/tabs-workspaces"
+  />
+  <LinkCard
+    title="Remote hosts"
+    description="Open servers over SSH or Tailscale, with the same shell everywhere."
+    href="/docs/using/remote-hosts"
   />
   <LinkCard
     title="Settings & profiles"
-    description="Preview, apply and roll back changes, or export your setup."
+    description="Preview, apply and roll back changes."
     href="/docs/customize/settings"
-  />
-  <LinkCard
-    title="Plugins"
-    description="One-click setups for tools like eza, zoxide and bat."
-    href="/docs/customize/plugins"
-  />
-  <LinkCard
-    title="Download latest releases"
-    description="Grab the Windows installer, .deb, .rpm, or tarball builds from GitHub Releases."
-    href="https://github.com/goatty-dev/goatty/releases"
-  />
-  <LinkCard
-    title="Source & issue tracker"
-    description="Browse the codebase, report bugs, or follow macOS progress."
-    href="https://github.com/goatty-dev/goatty"
   />
 </CardGrid>

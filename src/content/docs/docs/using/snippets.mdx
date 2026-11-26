@@ -29,16 +29,16 @@ A snippet is a command with blanks. You search for what you want to do, goatty a
    The last <kbd>Enter</kbd> puts the command on the prompt of the focused pane, at the cursor. It goes through the normal paste check, so a command like `curl … | sh` still asks first.
 </Steps>
 
-Each snippet has a **safety badge**: `safe`, `changes` or `destructive`. Snippets for programs that aren't installed on the host are listed last and dimmed ("Needs docker").
+The selected snippet's command is previewed below the list with its blanks. A snippet that deletes data has a red trash icon and says "Deletes data, there's no undo". Snippets for programs that aren't installed on the host are listed last and dimmed ("Needs docker").
 
 ### Your own snippets
 
 - **Save the last command.** From the palette, choose **Snippets: Save the last command as a snippet…**. goatty opens the editor with your last command. Put `{name}` where a value should change, and it becomes a blank.
-- **Settings → Snippets** lets you add, edit, switch off or delete your own, and copy a built-in one to change it ("Make my own copy").
+- [**Settings → Snippets**](goatty://settings/snippets?setting=snippets) lets you add, edit, switch off or delete your own, and copy a built-in one to change it ("Make my own copy"). Typing `{name}` into the command line adds a blank, and you choose its question and suggestions.
 - **Command line:** `goattyd snippet list | show | add | rm | export | import`. Export and import use the same format plugins use, so a collection moves between machines unchanged.
 
 <Aside type="tip">
-  Your snippets are part of your host settings, so they travel with the rest of your shell setup when goatty [syncs it to another host](/docs/using/remote-hosts).
+  Your snippets are part of your shell settings, so they travel with the rest of your setup when goatty [syncs it to other hosts](/docs/customize/sync).
 </Aside>
 
 ## Expansions
@@ -54,11 +54,11 @@ Expansions rewrite plain words into a command while you type. With the built-in 
 - <kbd>Backspace</kbd> straight after an expansion undoes it and brings back what you typed.
 - Nothing is expanded inside quotes or after a paste.
 
-You can turn expansions off with the `shell.expansions` switch on **Settings → Snippets**, where there's also a **Try it** field to test rules.
+You can turn expansions off with [Expand plain words while typing](goatty://settings/snippets?setting=shell.expansions), where there's also a **Try it** field to test rules.
 
 ## What's built in
 
-goatty ships the **Basics** pack: about 35 everyday snippets and a dozen expansions, on by default. Plugins from the [registry](/docs/customize/plugins) can add more. You can turn Basics off like any other built-in plugin.
+goatty ships the **Basics** pack: about 35 everyday snippets and a dozen expansions, on by default. Plugins from the [registry](/docs/customize/plugins) can add more. You can turn Basics off like any other built-in plugin. Snippets and expansions work in both zsh and PowerShell.
 
 ## Going further
 

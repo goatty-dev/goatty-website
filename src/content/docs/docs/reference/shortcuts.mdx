@@ -1,0 +1,74 @@
+---
+title: Keyboard shortcuts
+description: The default keys for copying, tabs, panes, workspaces, search and more, and how to change them.
+---
+
+Every shortcut is an action you can rebind on the [Shortcuts page](goatty://settings/shortcuts): search, press the new keys, reset. goatty warns you if a key you record replaces another action's key, or one your shell uses. Actions without a default key are still in the command palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>).
+
+Keys that a full-screen program needs (vim, htop) are left alone where it makes sense: <kbd>Alt</kbd>+digit and <kbd>Alt</kbd>+arrow only act when there's such a tab or pane.
+
+## Everyday
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Command palette |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Settings |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | [Snippets](/docs/using/snippets) |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> | Connect to a host, or pick a session |
+| <kbd>Ctrl</kbd>+<kbd>C</kbd> | Copy if text is selected, otherwise interrupt |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> | Copy |
+| <kbd>Ctrl</kbd>+<kbd>V</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> | Paste |
+| <kbd>Menu</kbd> / <kbd>Shift</kbd>+<kbd>F10</kbd> | Open the context menu from the keyboard |
+
+## Output and scrolling
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Find in the output |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | View the last command's output |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> | Previous / next command |
+| <kbd>Shift</kbd>+<kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Scroll a screen |
+| <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd> | Bigger / smaller / reset text |
+
+## Tabs and windows
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> | New tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> | New window (same workspace) |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | Close the pane, and the tab with its last pane |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> | Reattach what you detached last on this host |
+| <kbd>Ctrl</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>PgDn</kbd> | Next tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>PgUp</kbd> | Previous tab |
+| <kbd>Alt</kbd>+<kbd>1</kbd> … <kbd>8</kbd> | Go to tab 1 to 8 |
+| <kbd>Alt</kbd>+<kbd>9</kbd> | Go to the last tab |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Move the tab left / right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> | Fold or unfold the tab sidebar (vertical tabs) |
+
+## Panes
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>E</kbd> | Split right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> | Split down |
+| <kbd>Alt</kbd>+<kbd>←↑↓→</kbd> | Focus the pane in that direction |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>←↑↓→</kbd> | Resize |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Zoom the pane, and back |
+
+## Workspaces
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>W</kbd> | Switch workspace |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>PgDn</kbd> / <kbd>PgUp</kbd> | Next / previous workspace |
+
+## In settings
+
+| Keys | Does |
+| --- | --- |
+| <kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search settings |
+| <kbd>Esc</kbd> | Leave the search |
+
+## Available without a key
+
+Bind these yourself if you use them often: detach a pane, tab or host, rename or duplicate a tab, split left or up, swap, rotate, move and merge panes, new, rename and close workspace, toggle vertical tabs, put `sudo` in front of the command, copy or clear the command line, open it in `$EDITOR`, and the notification actions. You can also bind [your own commands and plugin commands](goatty://settings/shortcuts?setting=commands.custom).

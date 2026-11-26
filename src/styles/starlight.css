@@ -289,6 +289,12 @@
     text-decoration-color: #f2f2f0;
   }
 
+  /* goatty:// deep links open a setting in the running app: dotted underline */
+  .sl-markdown-content a[href^="goatty://"]:not(:where(.not-content *)) {
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(255, 110, 31, 0.7);
+  }
+
   /* Inline code & keyboard caps */
   .sl-markdown-content :not(pre) > code:not(:where(.not-content *)) {
     background-color: #0f0f12;

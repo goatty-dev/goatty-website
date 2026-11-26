@@ -1,41 +1,53 @@
 ---
 title: Settings & profiles
-description: Change everything visually, preview shell changes before they apply, and roll back if you don't like them.
+description: Change everything visually, preview shell changes before they apply, roll back, and move your setup between computers.
 ---
 
 import { Aside, Steps } from "@astrojs/starlight/components";
 
-Open Settings with <kbd>Ctrl</kbd>+<kbd>,</kbd>. Use **Search settings** at the top to find any setting by its name or by what it does.
+Open Settings with <kbd>Ctrl</kbd>+<kbd>,</kbd>. Press <kbd>/</kbd> (or <kbd>Ctrl</kbd>+<kbd>F</kbd>) to search every setting by its name or by what it does. Throughout these docs, links such as [Open links](goatty://settings/terminal?setting=links.open_on) jump straight to a setting in your running goatty. See [goatty:// links](/docs/reference/links).
 
 ## The pages
 
 | Page | What it controls |
 | --- | --- |
-| **Appearance** | Themes (one, or light and dark following your desktop), fonts, size, cursor, padding, background opacity and blur. |
-| **Terminal** | Links, selection and copy behavior, right-click action. |
-| **Workspace** | New window layout, tab style, program icons, notifications. |
-| **Shortcuts** | Every action and its keys. Search, record a new keystroke, reset. |
-| **Hosts** and **Network** | [SSH and Tailscale hosts](/docs/using/remote-hosts). |
-| **Shell**, **Dotfiles**, **PATH** | [Managed Zsh](/docs/using/managed-zsh), what's imported from your setup, PATH folders. |
-| **Prompt** and **History** | The Starship prompt and shell history. |
-| **Aliases** | Your aliases, and the ones plugins add. |
-| **Snippets** | [Snippets & expansions](/docs/using/snippets). |
-| **Plugins** | [Browse, install and configure plugins](/docs/customize/plugins). |
-| **Diagnostics** | A health report for the shell on the current host. |
-| **Profile** | Problems, file locations, export and import, version history. |
+| [**Appearance**](goatty://settings/appearance) | Themes (one, or light and dark following your desktop), fonts, size, cursor, padding, opacity and blur, title bar. |
+| [**Terminal**](goatty://settings/terminal) | Links, selection and copy, paste protection, right click, scrolling. |
+| [**Workspace**](goatty://settings/workspace) | What starts, tab style, program icons, notifications. |
+| [**Shortcuts**](goatty://settings/shortcuts) | Every action and its keys, plus your own commands. |
+| [**Hosts**](goatty://settings/hosts) and [**Network**](goatty://settings/network) | [SSH and Tailscale hosts](/docs/using/remote-hosts), and the [shared shell config](/docs/customize/sync). |
+| [**Shell**](goatty://settings/shell), [**Dotfiles**](goatty://settings/dotfiles), [**PATH**](goatty://settings/path) | The [managed shell](/docs/using/managed-zsh), what's imported from your setup, PATH folders. |
+| [**Prompt**](goatty://settings/prompt), [**History**](goatty://settings/history) | The Starship prompt and shell history. |
+| [**Aliases**](goatty://settings/aliases) | Your aliases, and the ones plugins add. |
+| [**Snippets**](goatty://settings/snippets) | [Snippets & expansions](/docs/using/snippets). |
+| [**Plugins**](goatty://settings/plugins) | [Browse, install and configure plugins](/docs/customize/plugins). |
+| [**Diagnostics**](goatty://settings/diagnostics) | A health report for the shell on the current host. |
+| [**Profile**](goatty://settings/profile) | Problems, file locations, export and import, version history. |
 
 ## Two kinds of settings
 
-goatty keeps two settings files in `~/.config/goatty/`:
+| | Window settings | Shell settings |
+| --- | --- | --- |
+| **Pages** | Appearance, Terminal, Workspace, Shortcuts, Hosts, Network | Shell, Dotfiles, PATH, Prompt, History, Aliases, Snippets, Plugins |
+| **Lives on** | the computer you're sitting at | each host (every machine running `goattyd`) |
+| **File** | `settings.json` | `host.json` (plus the [shared config](/docs/customize/sync)) |
+| **Applies** | immediately | after Preview → Apply |
 
-- `settings.json` is for **this computer's window**: fonts, theme, shortcuts, tabs. It lives where the window runs.
-- `host.json` is for **the shell on each host**: prompt, aliases, history, plugins. Every machine running `goattyd` has its own.
+The files are in `~/.config/goatty/` (`%APPDATA%\goatty` on Windows). They're readable JSON, and only values that differ from the defaults are written, so improved defaults reach you automatically. Find the exact paths on the Profile page.
 
-When you connect to another host, the shell pages show *that* host's settings. Files stay readable JSON, and only values that differ from the defaults are written, so improved defaults reach you automatically.
+When you're in a tab on another host, the shell pages show *that* host's settings.
+
+## Themes
+
+[Appearance](goatty://settings/appearance?setting=theme.follow_system) has a theme gallery. Pick one theme, or turn on **Follow the system** and assign a light and a dark theme.
+
+- **Import** color schemes in base16 (YAML or JSON), iTerm2 `.itermcolors` or Windows Terminal format. From a terminal: `goatty theme import file`.
+- **Customize colors** opens a color editor with contrast checks. Save the result as your own theme, or clear the changes.
+- Put a theme file in `~/.config/goatty/themes/` and it shows up in the gallery.
 
 ## Preview, then apply
 
-Window settings (theme, fonts, cursor) change live. **Shell** settings are collected in a draft first:
+Window settings change live. Shell settings are collected in a draft first:
 
 <Steps>
 1. Change settings on any shell page.
@@ -48,7 +60,7 @@ Window settings (theme, fonts, cursor) change live. **Shell** settings are colle
 
 3. Choose **Apply**, or **Discard**.
 
-   Apply validates the new configuration first. If it's invalid, nothing changes.
+   Apply checks the new configuration first. If it's invalid, nothing changes.
 
 4. Choose **Reload running shells** when offered.
 
@@ -57,32 +69,44 @@ Window settings (theme, fonts, cursor) change live. **Shell** settings are colle
 
 ## Roll back
 
-Every applied change is a **generation**. Under **Settings → Profile** you can see what each one changed, name them (for example "before trying fish"), and roll back to any of the last 10. From a terminal:
+Every applied change is a **generation**. On the [Profile page](goatty://settings/profile) you can see what each one changed, name them (say, "before trying fish"), and roll back to any of the last 10. From a terminal:
 
 ```bash
 goattyd shell generations     # list them
 goattyd shell diff 8          # what changed in generation 8
+goattyd shell name 8 before trying fish
 goattyd shell rollback        # go back to the previous one
 ```
 
+Rolling back also restores the settings that generation was built from.
+
 ## Profiles: export and import
 
-**Profile → Export** writes your settings as one file, with only non-default values and without machine-specific ones. **Import** applies the window settings right away and stages the shell part as a draft for you to preview and apply. This is a quick way to set up a new computer.
+**Profile → Export** writes your settings to one file, with only non-default values and without machine-specific ones. **Import** applies the window settings right away and stages the shell part as a draft for you to preview and apply. That's a quick way to set up a new computer. To keep *shells* in step across machines continuously, use [Sync across hosts](/docs/customize/sync) instead.
+
+## When something is wrong
+
+If a value in a settings file is invalid, goatty reverts just that value to its default and says so: on the row, in a toast, and on the Profile page, which lists every problem with a **Show** button that jumps to it. The rest of your settings are kept, and the file is left untouched.
+
+Environment variables such as `GOATTY_FONT_SIZE` override a setting for one run. The row then says *Set by GOATTY_FONT_SIZE for this run* and is disabled.
 
 ## From the command line
 
-Everything also works without a window, which is useful for scripts, SSH sessions and dotfile repos:
+Everything also works without a window, which suits scripts, SSH sessions and dotfile repos:
 
 ```bash
 goatty settings show font          # what's stored for a key
-goatty settings set font.size 15   # change a value
+goatty settings set font.size 15   # a running goatty picks it up within a moment
+goatty settings unset font.size
 goatty settings validate           # exit code 1 on problems
-goatty theme list                  # themes
 goatty settings export profile.json
+goatty settings import profile.json --ssh myserver   # the shell part goes to that host
+goatty theme list
+goatty theme set nord --for dark
 ```
 
-<Aside type="tip" title="Mistakes are forgiven">
-  If a value in a settings file is invalid, goatty reverts just that value to its default and tells you about it on the Profile page. The rest of your settings are kept, and the file is left untouched.
-</Aside>
+`goattyd settings …` does the same for a host's shell settings. See the [command reference](/docs/reference/cli).
 
-The full details of the settings model are in the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/profiles.md).
+<Aside type="tip">
+  The full details of the settings model are in the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/profiles.md).
+</Aside>

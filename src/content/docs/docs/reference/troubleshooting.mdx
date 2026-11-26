@@ -1,0 +1,63 @@
+---
+title: Troubleshooting
+description: Quick fixes for a missing command, odd prompt icons, connection problems, outdated daemons and settings that don't apply.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+**First stop:** [Settings → Diagnostics](goatty://settings/diagnostics) lists every tool, where it comes from, startup time and errors. **Copy report** puts it on your clipboard for a bug report. [About](goatty://settings/about) has a short summary of your version and connection for the same purpose.
+
+## A command isn't found
+
+A program works in your old terminal but not in goatty.
+
+1. Open [**PATH**](goatty://settings/path). It shows the `PATH` a new shell gets, and where each folder came from.
+2. If the folder is missing, check that [importing from your shell](goatty://settings/dotfiles?setting=shell.import.enabled) is on and press **Check again**, or [add the folder](goatty://settings/path?setting=shell.path).
+3. Functions such as `nvm` or `conda activate` aren't imported. Use a [plugin](/docs/customize/plugins), or [turn on your `.zshrc`](goatty://settings/dotfiles?setting=shell.zsh.user_rc).
+
+Existing shells don't see a changed setting until they [reload](/docs/using/managed-zsh#applying-changes).
+
+## Prompt icons show as boxes
+
+Starship's icons need a Nerd Font. goatty bundles one for its own terminal, but other terminals (such as VS Code's) may not have it. Set [Icons in other terminals](goatty://settings/prompt?setting=prompt.icons_elsewhere), or pick text [symbols](goatty://settings/prompt?setting=prompt.symbols).
+
+## The shell misbehaves
+
+Start a single shell without goatty's configuration to see if it's the cause:
+
+```bash
+GOATTY_SHELL_MANAGED=0 zsh
+```
+
+If that fixes it, switch off [plugins](goatty://settings/plugins) one by one, or [roll back](/docs/customize/settings#roll-back) to an earlier generation.
+
+## A setting doesn't apply
+
+- Shell settings need **Apply** (and a [reload](/docs/using/managed-zsh#applying-changes) for running shells).
+- A row that says *Set by GOATTY_…* is overridden by an environment variable.
+- The [Profile page](goatty://settings/profile) lists invalid values. goatty already ignored them and kept the rest.
+
+## Connecting to a host fails
+
+goatty shows what went wrong in the tab and offers a fix where it can: **Install goattyd**, **Update and restart**, **Retry**, or **Plain SSH**. If it keeps failing:
+
+- Check that plain `ssh myserver` works from a terminal.
+- Choose **Plain SSH** to confirm it's the goattyd side and not the network.
+
+## "Update and restart" or "outdated goattyd"
+
+goattyd keeps shells alive across goatty updates. After an update, a running daemon from the old version may need a restart. goatty offers it when you connect, and on Linux it keeps your sessions. Do it by hand with `goattyd restart`. On Windows, updating ends sessions, because the installer must stop goattyd. See [Sessions & detaching](/docs/using/sessions#what-survives).
+
+## Tailscale pairing
+
+- Tailscale must be installed and logged in on both computers. goatty never does that for you.
+- If goatty says Tailscale doesn't allow it to add its route, it shows the one command to run (on Linux: `sudo tailscale set --operator=$USER`).
+- A host doesn't show up in the list? Pair with its name or IP directly in [Settings → Network](goatty://settings/network).
+
+## Windows SmartScreen warns about the installer
+
+The Windows builds aren't code-signed yet. Choose *More info → Run anyway*.
+
+<Aside type="tip">
+  Still stuck? Open an issue on [GitHub](https://github.com/goatty-dev/goatty/issues) and paste the Diagnostics report.
+</Aside>

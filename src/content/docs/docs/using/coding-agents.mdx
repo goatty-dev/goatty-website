@@ -26,7 +26,7 @@ Agents that don't report their state still get their logo, and goatty still pass
 ## What you see
 
 - **Tab icon:** the agent's logo.
-- **Tab mark:** a spinner while it works, a pulsing badge when it's blocked and waiting for you (with an icon for permission, question or login), and a check or cross when it's done or has failed. A done or failed mark stays until you've looked at the tab.
+- **Tab mark:** a spinner while it works, a warning-colored badge when it's blocked and waiting for you (with an icon for permission, question or login), and a check or cross when it's done or has failed. A done or failed mark stays until you've looked at the tab.
 - **Background tabs:** a tab waiting for you is tinted in the warning color, so you can spot it in a long tab list.
 - **Vertical tabs:** a second line says what the agent is doing, for example "Waiting for permission · Bash: cargo test".
 - **Progress:** a thin line along the bottom of the tab shows the agent's progress.
@@ -34,7 +34,7 @@ Agents that don't report their state still get their logo, and goatty still pass
 
 ## Notifications
 
-goatty tells you in two places: inside the app (a toast) and on the desktop. Under **Settings → Workspace → Notifications** you choose for each one when it shows:
+goatty tells you in two places: inside the app (a toast) and on the desktop. Under [**Settings → Workspace → Notifications**](goatty://settings/workspace?setting=notifications.in_app) you choose for each one when it shows:
 
 | Option | Meaning |
 | --- | --- |
@@ -51,6 +51,6 @@ You can also pick which events notify you: an agent **waiting for you**, an agen
 
 ## Keep agents running
 
-Run an agent inside a `goattyd` session and it keeps going when you close the window. Reopen goatty and the tab, its state and its notifications are all still there. See [Remote hosts & sessions](/docs/using/remote-hosts).
+Every goatty pane is a `goattyd` session, so an agent keeps going when you close the window. Reopen goatty and the tab, its state and its notifications are all still there. The same works on a [remote host](/docs/using/remote-hosts), where an agent survives a dropped connection. See [Sessions & detaching](/docs/using/sessions).
 
 For the protocol details and how each agent was checked, see the [technical docs on GitHub](https://github.com/goatty-dev/goatty/blob/main/docs/coding-agents.md).

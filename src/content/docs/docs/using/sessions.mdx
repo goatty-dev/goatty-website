@@ -1,0 +1,70 @@
+---
+title: Sessions & detaching
+description: How goatty keeps your shells running when you close the window, and how to detach, reattach and end them on purpose.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Your shells don't live in the window. They live in **goattyd**, a small background program that starts automatically with goatty. The window is just a client that shows them. That's why closing it, or losing an SSH connection, doesn't kill what you were running.
+
+## Close vs. detach
+
+| You do | What happens to the shell |
+| --- | --- |
+| Close the window | **Detached.** It keeps running. |
+| Close a pane or tab (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd>) | **Ended.** goatty asks first if a program is running in it. |
+| Detach a pane, tab or host | **Detached** on purpose, with the tab saved in its workspace. |
+
+Start goatty again and everything comes back: windows, tabs, splits and running programs, on this computer and on your remote hosts. [When goatty starts](goatty://settings/workspace?setting=workspace.on_launch) controls how much is restored.
+
+If a program is running when you close a pane or tab, the dialog offers **Close** (ends it), **Detach** (<kbd>D</kbd>, keeps it running) and **Cancel**. You can switch the question off with [Ask before closing a running program](goatty://settings/workspace?setting=panes.confirm_close).
+
+## Detach and reattach
+
+Detach from the right-click menu of a pane or tab, from the close dialog, or from the palette: **Detach the pane**, **Detach the tab**, **Detach the other tabs**, **Detach from this host**.
+
+Detached tabs stay in their workspace, and tabs detached together come back together. To bring them back:
+
+- press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> to reattach what you detached last on this host,
+- click **Undo** on the toast that appears when you detach,
+- or open the **Sessions** list (palette: **Sessions on this host**, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> and pick a host). It lists the host's workspaces, detached tabs and every session. <kbd>Enter</kbd> opens one. <kbd>Shift</kbd>+<kbd>Delete</kbd> ends one.
+
+## What survives
+
+| Event | Your shells |
+| --- | --- |
+| Closing the window, losing the SSH link | Keep running. goatty reconnects by itself and shows *reconnecting* in the title. |
+| Updating goatty (Linux) | Keep running. goatty restarts an outdated local goattyd and hands the sessions over. For a remote host it offers **Update and restart**. |
+| Updating goatty (Windows) | The installer stops goattyd, which ends its sessions. Close long jobs first. |
+| `goattyd stop` | Ends every session. |
+| Rebooting the machine | Ends every shell. Processes can't be resumed. |
+
+## Keep goattyd running across logouts
+
+goattyd starts on demand. To have it managed by your system, install it as a user service (systemd on Linux, launchd on macOS, a Scheduled Task on Windows):
+
+```bash
+goattyd service install
+goattyd service status
+```
+
+On a Linux server, also run `loginctl enable-linger $USER`. Without it systemd stops your user services when your last login ends. `goattyd service install` tells you if it's missing.
+
+## Without goattyd
+
+`goatty --local` skips the daemon. The window owns its shell, which ends when the window closes, and detaching isn't available. It's a debugging fallback, not the normal mode.
+
+## From the command line
+
+```bash
+goattyd list            # sessions on this host
+goattyd workspaces      # workspaces, their tabs and the windows showing them
+goattyd kill 3          # end session 3
+goatty --attach 3       # open session 3
+goattyd send 3 'ls\r'   # type into a session (\r is Enter)
+goattyd restart         # restart the daemon; sessions keep running
+```
+
+<Aside type="note">
+  Only one goattyd runs per user and host. Several windows, and even several goatty processes, share it.
+</Aside>

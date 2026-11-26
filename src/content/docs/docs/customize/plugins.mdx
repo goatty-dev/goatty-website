@@ -1,13 +1,13 @@
 ---
 title: Plugins
-description: One-click setups for command-line tools, with plain-words settings and a review before anything is installed.
+description: One-click setups for command-line tools, with plain-words settings and a review before anything is installed. Works on Linux and Windows.
 ---
 
 import { Aside, Steps } from "@astrojs/starlight/components";
 
-A goatty plugin packages a command-line tool so that someone who has never used it gets a good setup in one click. goatty downloads the tool into its own directory, shows the most useful options on the **Plugins** settings page with explanations, and wires them into your managed shell.
+A goatty plugin packages a command-line tool so that someone who has never used it gets a good setup in one click. goatty downloads the tool into its own folder, shows the most useful options on the [Plugins page](goatty://settings/plugins) with explanations, and wires it into your [managed shell](/docs/using/managed-zsh), zsh on Linux and PowerShell on Windows.
 
-Nothing outside goatty's own directories changes, and nothing runs as root.
+Nothing outside goatty's own folders changes, and nothing runs as root.
 
 ## Built in
 
@@ -21,12 +21,12 @@ These come with goatty and are on by default:
 | `starship` | The prompt |
 | `basics` | The built-in [snippets and expansions](/docs/using/snippets) |
 
-Each has its own page under **Settings → Plugins**, where you can switch it off or change its options.
+Each has its own page under **Settings → Plugins**, where you can switch it off or change its options. Updates to their tools come with goatty releases.
 
 ## Install a plugin
 
 <Steps>
-1. Open **Settings → Plugins** (<kbd>Ctrl</kbd>+<kbd>,</kbd>), or use the palette: **Plugins: browse, install and configure**.
+1. Open [**Settings → Plugins**](goatty://settings/plugins), or the palette: **Plugins: browse, install and configure**.
 
 2. Pick a plugin from the registry.
 
@@ -41,17 +41,22 @@ Each has its own page under **Settings → Plugins**, where you can switch it of
    You can watch progress and cancel until it's activated.
 </Steps>
 
-Installed plugins show their settings as normal controls: toggles, choices, steppers and text fields, with help text. Their edits go through the same **Preview / Apply** draft as your other [shell settings](/docs/customize/settings).
+Installed plugins show their settings as normal controls with help text. Their edits go through the same [Preview / Apply](/docs/customize/settings#preview-then-apply) draft as your other shell settings, and, when you edit under *All synced hosts*, they [sync to your other hosts](/docs/customize/sync).
 
 ### Examples from the official registry
 
 | Plugin | Sets up |
 | --- | --- |
-| **eza** | A modern `ls`, with icons, grouping, git column and tree depth options |
-| **zoxide** | Jump to directories you use often, with `z` |
-| **bat** | `cat` with syntax highlighting and goatty's colors, also used for man pages |
+| [**eza**](goatty://plugins/eza) | A modern `ls`, with icons, grouping, git column and tree depth options |
+| [**zoxide**](goatty://plugins/zoxide) | Jump to directories you use often, with `z` |
+| [**bat**](goatty://plugins/bat) | `cat` with syntax highlighting and goatty's colors, also used for man pages |
+| [**atuin**](goatty://plugins/atuin) | A searchable history database on <kbd>Ctrl</kbd>+<kbd>R</kbd> |
 
-Browse the current list on the Plugins page or with `goattyd plugin search`.
+[Browse them all](goatty://plugins), or run `goattyd plugin search`. A plugin can also add commands to the palette and your own shortcuts.
+
+## Keep plugins up to date
+
+goatty checks for new versions in the background and tells you, but never installs anything on its own. An update shows only what *changed* from the version you have, and asks for a fresh review when the new version can do something the old one couldn't. You can turn the notices off with [Tell me about plugin updates](goatty://settings/plugins?setting=plugins.notify_updates).
 
 ## Permissions and trust
 
@@ -61,7 +66,7 @@ Plugins ask for specific permissions: install programs, add aliases, set environ
   The official registry is signed, and goatty only accepts it with its pinned key, so you know where a plugin came from and that it wasn't changed. That doesn't make a program harmless. Read the plan before you install, especially anything that runs shell code.
 </Aside>
 
-Other registries can be added, but only with their public key explicitly. There is no trust on first use. Plugin updates are checked in the background, and updating asks for the same review.
+What you approve is exactly what is installed: if the plan changes between review and install, goatty refuses. Other registries can be added, but only together with their public key (`goattyd plugin registry add`). There is no trust on first use.
 
 ## From the command line
 
@@ -72,11 +77,13 @@ goattyd plugin search eza     # what registries offer
 goattyd plugin info eza       # settings, permissions
 goattyd plugin install eza    # prints the plan, then asks [y/N]
 goattyd plugin list           # installed, with updates and problems
+goattyd plugin update         # newer versions, same review
 goattyd plugin set eza KEY VALUE
+goattyd plugin disable eza    # keep it installed, out of the shell
 ```
 
 ## Write your own
 
-Plugins are plain TOML manifests. The [plugin template](https://github.com/goatty-dev/goatty-plugin-template) is a complete, commented example and includes a Claude Code skill to help you write one. To get one into the official registry, see [goatty-registry](https://github.com/goatty-dev/goatty-registry).
+Plugins are plain TOML manifests. The [plugin template](https://github.com/goatty-dev/goatty-plugin-template) is a complete, commented example and includes a Claude Code skill to help you write one. Test a local plugin with `goattyd plugin install --path ./my-plugin`. To get one into the official registry, see [goatty-registry](https://github.com/goatty-dev/goatty-registry).
 
-The full manifest format is in the [plugin technical docs](https://github.com/goatty-dev/goatty/blob/main/docs/plugins.md).
+A plugin can limit itself to some systems or shells (`os`, `shells`), so one plugin can support zsh and PowerShell. The full manifest format is in the [plugin technical docs](https://github.com/goatty-dev/goatty/blob/main/docs/plugins.md).

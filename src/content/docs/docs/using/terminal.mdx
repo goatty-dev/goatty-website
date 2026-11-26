@@ -1,0 +1,66 @@
+---
+title: Terminal basics
+description: Copy and paste, clickable links, searching output, jumping between commands, and the command palette.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Command palette
+
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> searches every action, host, session and plugin command. If you only remember what something does, start there. Shortcuts are shown next to each entry.
+
+## Copy and paste
+
+- <kbd>Ctrl</kbd>+<kbd>C</kbd> copies when text is selected and sends an interrupt otherwise. <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> always copies.
+- <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> paste.
+- On Linux, selecting text also fills the primary selection, and a middle click pastes it. [Change this](goatty://settings/terminal?setting=selection.primary).
+- To copy as soon as you select, turn on [Copy when you select](goatty://settings/terminal?setting=selection.auto_copy).
+- **Right click** opens goatty's menu. Programs that use the mouse (vim, tmux) get the click instead, unless you hold <kbd>Shift</kbd>. Prefer Windows Terminal style (copy or paste)? [Change the right click](goatty://settings/terminal?setting=mouse.right_click).
+
+### Paste protection
+
+goatty asks before pasting something risky: text that would run commands right away, hidden control characters, `curl … | sh`, or a huge paste. You can make it also ask for every multi-line paste, or never. See [Ask before pasting](goatty://settings/terminal?setting=paste.confirm).
+
+### Copy from a remote host
+
+`xclip` and `wl-copy` can't reach your local clipboard from an SSH session. goatty's zsh has a `copy` command that can:
+
+```bash
+cat build.log | copy
+copy notes.txt
+```
+
+It works on every host, because the text travels with the terminal output. Programs like vim and tmux can set your clipboard the same way (OSC 52). goatty shows a toast when one does, and never lets a program *read* the clipboard. Adjust it under [When a program copies](goatty://settings/terminal?setting=clipboard.programs).
+
+## Links
+
+<kbd>Ctrl</kbd>+click opens URLs, files and directories shown in the terminal (a plain click still selects). You can make [a plain click open them](goatty://settings/terminal?setting=links.open_on), and choose the program for files with [Open files with](goatty://settings/terminal?setting=links.file_opener), for example `code --goto {path}:{line}:{column}`.
+
+Files on a remote host open as a read-only local copy, or directly in your editor with [Open remote files with](goatty://settings/terminal?setting=links.remote_file_opener).
+
+## Find, and read the last output
+
+| Keys | Does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Search the pane's whole output |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Open the last command's output on its own |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> | Jump to the previous or next command |
+| <kbd>Shift</kbd>+<kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Scroll by a screen |
+
+Splitting output by command, and jumping between prompts, needs [shell integration](/docs/using/managed-zsh), which the managed shell has. Without it, only searching all output works.
+
+## Edit the command you're typing
+
+With the managed shell, the right-click menu and the palette can act on the command at your prompt, even in the middle of typing: copy it, [save it as a snippet](/docs/using/snippets), put `sudo` in front (or remove it), clear it, or open it in `$EDITOR`. Bind any of these to keys on the [Shortcuts page](goatty://settings/shortcuts).
+
+## Text size
+
+<kbd>Ctrl</kbd>+<kbd>+</kbd> and <kbd>Ctrl</kbd>+<kbd>-</kbd> zoom, <kbd>Ctrl</kbd>+<kbd>0</kbd> resets. This works on US and German layouts, with or without <kbd>Shift</kbd>. The default size is under [Appearance](goatty://settings/appearance?setting=font.size).
+
+## Your own commands
+
+On the [Shortcuts page](goatty://settings/shortcuts?setting=commands.custom) you can add custom commands: a title, the program to run (say `lazygit`) and where it opens (the current pane, a split, or a tab). They appear in the palette and can have a shortcut.
+
+<Aside type="note">
+  Links that look like <a href="goatty://settings/terminal">this one</a> open a setting in your running goatty. See [goatty:// links](/docs/reference/links).
+</Aside>

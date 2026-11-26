@@ -99,20 +99,36 @@ export default defineConfig({
         {
           label: "Using goatty",
           items: [
-            { label: "Managed Zsh", slug: "docs/using/managed-zsh" },
+            { label: "Terminal basics", slug: "docs/using/terminal" },
+            {
+              label: "Tabs, panes & workspaces",
+              slug: "docs/using/tabs-workspaces",
+            },
+            { label: "Sessions & detaching", slug: "docs/using/sessions" },
+            { label: "Managed shell", slug: "docs/using/managed-zsh" },
             { label: "Snippets & expansions", slug: "docs/using/snippets" },
             { label: "Coding agents", slug: "docs/using/coding-agents" },
-            {
-              label: "Remote hosts & sessions",
-              slug: "docs/using/remote-hosts",
-            },
+            { label: "Remote hosts", slug: "docs/using/remote-hosts" },
           ],
         },
         {
           label: "Customize",
           items: [
             { label: "Settings & profiles", slug: "docs/customize/settings" },
+            { label: "Sync across hosts", slug: "docs/customize/sync" },
             { label: "Plugins", slug: "docs/customize/plugins" },
+          ],
+        },
+        {
+          label: "Reference",
+          items: [
+            { label: "Keyboard shortcuts", slug: "docs/reference/shortcuts" },
+            { label: "Command line", slug: "docs/reference/cli" },
+            { label: "goatty:// links", slug: "docs/reference/links" },
+            {
+              label: "Troubleshooting",
+              slug: "docs/reference/troubleshooting",
+            },
           ],
         },
         {

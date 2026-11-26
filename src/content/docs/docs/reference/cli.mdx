@@ -1,0 +1,131 @@
+---
+title: Command line
+description: Every goatty and goattyd command, grouped by what you want to do.
+---
+
+Two programs ship with goatty:
+
+- **`goatty`** is the window (and a few commands that work without one). It works on *this* computer.
+- **`goattyd`** is the background daemon that owns your shells. Its subcommands manage the **host** they run on, which is handy over SSH.
+
+Run either with `--help` for details. goatty's managed shell has completions for both.
+
+## Start goatty
+
+```bash
+goatty                       # restore your windows (or start fresh), starts goattyd if needed
+goatty --new                 # a fresh tab in your most recent workspace
+goatty --attach 3            # open session 3 (see goattyd list)
+goatty --settings            # also open settings (or --settings prompt for a page)
+goatty --local               # no daemon: the window owns its shell
+```
+
+### Another host
+
+```bash
+goatty --ssh myserver                        # goattyd over SSH (goatty offers to install it)
+goatty --ssh myserver --plain                # plain ssh in a local session, nothing installed
+goatty --ssh myserver --remote-daemon PATH   # goattyd isn't in PATH there
+goatty --tailnet myserver                    # a paired Tailscale host
+goatty --via 'docker exec -i box goattyd proxy'    # any command that runs goattyd proxy
+```
+
+See [Remote hosts](/docs/using/remote-hosts).
+
+## Settings and themes (this computer)
+
+```bash
+goatty settings path | show [KEY] [--all] | validate [FILE]
+goatty settings set KEY VALUE        # e.g. font.size 15
+goatty settings unset KEY
+goatty settings export FILE|- [--ssh HOST | --via CMD]
+goatty settings import FILE|- [--yes] [--ssh HOST | --via CMD]
+
+goatty theme list | import FILE… | export ID [FILE] | set ID [--for light|dark] | delete ID
+```
+
+`set` reads values as JSON when it can (`true`, `5000`, `"#ff00ff"`), otherwise as text. A running goatty picks the change up within a moment. See [Settings & profiles](/docs/customize/settings).
+
+## Tailnet and sync
+
+```bash
+goatty net list [--all]                 # Tailscale state, paired and discovered hosts
+goatty net pair CODE|HOST[:PORT]        # pair using a code from `goattyd net pair`
+goatty net pair --ssh myserver          # pair a host you can reach over SSH
+goatty net forget HOST
+
+goatty sync HOST… [--join [--keep] | --separate] [--trust DEVICE]
+```
+
+See [Remote hosts](/docs/using/remote-hosts#connect-over-tailscale) and [Sync across hosts](/docs/customize/sync).
+
+## Links
+
+```bash
+goatty open goatty://settings/prompt
+```
+
+See [goatty:// links](/docs/reference/links).
+
+## goattyd: sessions and the daemon
+
+```bash
+goattyd list                 # sessions
+goattyd workspaces           # workspaces, their tabs and windows
+goattyd kill ID              # end a session
+goattyd send ID 'ls\r'       # type into a session (\r = Enter)
+goattyd restart              # restart with the installed version; sessions keep running
+goattyd stop                 # stop the daemon and end all sessions
+goattyd service install | uninstall | status   # run as a user service
+```
+
+See [Sessions & detaching](/docs/using/sessions).
+
+## goattyd: the shell on this host
+
+```bash
+goattyd shell status                     # what the shell loads, what's missing, startup time
+goattyd shell install | update | uninstall [TOOL…]
+goattyd shell generations | diff [N] | name N NAME… | rollback [N]
+goattyd shell reload                     # restart running managed shells with the new setup
+goattyd shell import [--refresh]         # what goatty imports from your own shell
+goattyd shell everywhere on | off | status
+
+goattyd settings path | show [KEY] [--all] | validate
+goattyd settings set KEY VALUE [--shared | --host]
+goattyd settings unset KEY [--shared | --host]
+
+goattyd alias list | add NAME COMMAND… | edit NAME | remove NAME… | enable | disable
+goattyd snippet list | show ID | add TITLE LINE | remove ID… | export | import FILE
+```
+
+`--shared` and `--host` matter on a host that [follows the shared config](/docs/customize/sync). `--host` (the default) sets an override for that host only.
+
+## goattyd: plugins, sync and network
+
+```bash
+goattyd plugin search [QUERY] | info ID | list
+goattyd plugin install ID[@VERSION]… [--yes] | update | uninstall ID…
+goattyd plugin enable ID | disable ID | set ID KEY VALUE | unset ID KEY
+goattyd plugin install --path DIR                 # a local plugin
+goattyd plugin registry list | refresh | add NAME URL --key HEX | remove NAME
+
+goattyd sync status [--json] | apply
+
+goattyd net status | enable | disable | pair | devices | revoke KEY | leave
+```
+
+See [Plugins](/docs/customize/plugins) and [Remote hosts](/docs/using/remote-hosts).
+
+## Inside the managed shell
+
+| Command | Does |
+| --- | --- |
+| `goatty-status` | Prints which tools are loaded or missing |
+| `goatty-setup` | Installs missing tools |
+| `goatty-reload` | Restarts this shell with the latest configuration |
+| `copy` | Copies stdin or files to your clipboard, even on a remote host (zsh) |
+
+## Environment variables
+
+Variables starting with `GOATTY_` override a setting for one run (they're never saved). The common ones: `GOATTY_FONT`, `GOATTY_FONT_SIZE`, `GOATTY_SHELL`, and `GOATTY_SOCKET` (which daemon to talk to). `GOATTY_SHELL_MANAGED=0` starts a single shell without goatty's configuration.
