@@ -62,10 +62,18 @@ expect_body() {
   echo "ok: GET $path contains '$needle'"
 }
 
+expect_redirect() {
+  local path="$1" want="$2" got
+  got="$(curl -s -o /dev/null --max-time 5 -w '%{http_code} %{redirect_url}' "$BASE$path" 2>/dev/null)" || got="000"
+  [[ "$got" == "302 $want" ]] || fail "GET $path returned '$got', expected '302 $want'"
+  echo "ok: GET $path -> $got"
+}
+
 echo "==> Static files in dist/"
 for file in \
   index.html \
   404.html \
+  _redirects \
   robots.txt \
   sitemap-index.xml \
   docs/index.html \
@@ -102,6 +110,8 @@ expect_status /docs/getting-started 200
 expect_status /robots.txt 200
 expect_status /sitemap-index.xml 200
 expect_status /does-not-exist 404
+expect_redirect /install.sh https://raw.githubusercontent.com/goatty-dev/goatty/main/scripts/get-goatty.sh
+expect_redirect /install.ps1 https://raw.githubusercontent.com/goatty-dev/goatty/main/scripts/get-goatty.ps1
 
 expect_body / "<html"
 expect_body /docs/getting-started "getting-started"

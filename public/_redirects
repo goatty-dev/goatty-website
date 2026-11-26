@@ -1,0 +1,5 @@
+# The one-line installers live in the goatty repo (scripts/get-goatty.sh and
+# get-goatty.ps1); serving them from main keeps one copy. curl -L and irm follow
+# the redirect.
+/install.sh https://raw.githubusercontent.com/goatty-dev/goatty/main/scripts/get-goatty.sh 302
+/install.ps1 https://raw.githubusercontent.com/goatty-dev/goatty/main/scripts/get-goatty.ps1 302
